@@ -636,8 +636,8 @@
     const today = new Date().toISOString().slice(0, 10);
     const categories = ["Food", "Drinks", "Hotel", "Fuel", "Activities", "Shopping", "Transport", "Other"];
     const defaultState = {
-      tripName: "Wales/Fargo Trip",
-      people: ["Anurag", "Karthik", "Sachin", "Sunny"],
+      tripName: "<Trip Name>",
+      people: ["Person1", "Person2", "Person3", "Person4"],
       expenses: [],
       audit: [],
       nextExpenseId: 1
@@ -669,7 +669,7 @@
     function loadState() {
       try {
         const saved = localStorage.getItem(storageKey());
-        if (saved) return normalizeState(JSON.parse(saved));
+        if (saved) return migrateDefaultLabels(normalizeState(JSON.parse(saved)));
       } catch (error) {
         console.warn(error);
       }
@@ -686,6 +686,17 @@
         audit: Array.isArray(value.audit) ? value.audit : [],
         nextExpenseId: Number(value.nextExpenseId || 1)
       };
+    }
+
+    function migrateDefaultLabels(value) {
+      const hasOldSeedData =
+        value.tripName === "Wales/Fargo Trip" &&
+        value.people.join("|") === "Anurag|Karthik|Sachin|Sunny" &&
+        value.expenses.length === 0;
+      if (!hasOldSeedData) return value;
+      value.tripName = defaultState.tripName;
+      value.people = clone(defaultState.people);
+      return value;
     }
 
     function auditEvent(text) {
