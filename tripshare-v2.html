@@ -1,0 +1,1291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TripShare v2</title>
+  <style>
+    :root {
+      --ink: #22252a;
+      --muted: #6c727f;
+      --line: #d8dde4;
+      --paper: #fbfaf7;
+      --panel: #ffffff;
+      --teal: #167d7f;
+      --teal-dark: #0f5f61;
+      --coral: #d7624b;
+      --amber: #d69a2d;
+      --mint: #dff3ec;
+      --rose: #fae8e4;
+      --shadow: 0 14px 38px rgba(34, 37, 42, 0.1);
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(223, 243, 236, 0.76), rgba(251, 250, 247, 0.92) 260px),
+        var(--paper);
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      padding: 9px 12px;
+      background: var(--ink);
+      color: #fff;
+      cursor: pointer;
+      min-height: 38px;
+    }
+
+    button:hover { filter: brightness(0.96); }
+    button:disabled { cursor: not-allowed; opacity: 0.52; }
+
+    .ghost {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+
+    .danger {
+      background: var(--coral);
+      color: #fff;
+    }
+
+    .accent {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px 11px;
+      background: #fff;
+      color: var(--ink);
+      min-height: 40px;
+    }
+
+    textarea { min-height: 76px; resize: vertical; }
+
+    label {
+      display: grid;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 650;
+      color: var(--muted);
+    }
+
+    h1, h2, h3, p {
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: clamp(28px, 4vw, 46px);
+      line-height: 1.02;
+      letter-spacing: 0;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    h3 {
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .app {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: start;
+      padding: 22px 0 18px;
+    }
+
+    .topbar p {
+      color: var(--muted);
+      margin-bottom: 0;
+      max-width: 680px;
+    }
+
+    .trip-name {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .trip-name input {
+      max-width: 320px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(255,255,255,0.74);
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--amber);
+    }
+
+    .dot.live { background: var(--teal); }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.72);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      margin-bottom: 18px;
+    }
+
+    .tab {
+      background: transparent;
+      color: var(--muted);
+      border-color: transparent;
+      white-space: nowrap;
+    }
+
+    .tab.active {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .panel.flat {
+      box-shadow: none;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .wide { grid-column: 1 / -1; }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .participant-list, .expense-list, .settlement-list, .audit-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .person, .expense, .settlement, .audit-item, .stat {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 12px;
+    }
+
+    .person {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .expense {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+    }
+
+    .expense strong, .person strong {
+      display: block;
+      overflow-wrap: anywhere;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .amount {
+      font-weight: 800;
+      font-size: 18px;
+      white-space: nowrap;
+    }
+
+    .small-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+
+    .small-actions button {
+      min-height: 32px;
+      padding: 6px 9px;
+      font-size: 13px;
+    }
+
+    .chips {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 13px;
+      min-height: 34px;
+    }
+
+    .chip input {
+      width: auto;
+      min-height: 0;
+      margin: 0;
+    }
+
+    .ratio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .ratio-grid label {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      background: linear-gradient(180deg, #fff, #fbfaf7);
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 22px;
+    }
+
+    .category-bars {
+      display: grid;
+      gap: 10px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .bar {
+      height: 9px;
+      background: #edf0f2;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      background: var(--teal);
+      border-radius: inherit;
+    }
+
+    .balance-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .balance-table th, .balance-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 6px;
+      text-align: right;
+    }
+
+    .balance-table th:first-child, .balance-table td:first-child {
+      text-align: left;
+    }
+
+    .positive { color: var(--teal-dark); font-weight: 800; }
+    .negative { color: var(--coral); font-weight: 800; }
+
+    .notice {
+      border: 1px solid #ecd5a3;
+      background: #fff7df;
+      color: #6b4b08;
+      border-radius: var(--radius);
+      padding: 11px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .empty {
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      text-align: center;
+      background: rgba(255,255,255,0.62);
+    }
+
+    .modal {
+      border: 0;
+      border-radius: var(--radius);
+      max-width: 520px;
+      width: calc(100% - 28px);
+      padding: 0;
+      box-shadow: 0 24px 70px rgba(34, 37, 42, 0.32);
+    }
+
+    .modal::backdrop {
+      background: rgba(34,37,42,0.38);
+    }
+
+    .modal-body {
+      padding: 18px;
+      background: #fff;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 860px) {
+      .app { padding: 14px; }
+      .topbar, .grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .expense { grid-template-columns: 1fr; }
+      .amount { white-space: normal; }
+      .bar-row { grid-template-columns: 86px minmax(0, 1fr); }
+      .bar-row strong { grid-column: 2; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <h1>TripShare v2</h1>
+        <p>Shared trip expenses with equal splits, ratio splits, settlements, undo, export, audit history, and optional Supabase live sync.</p>
+      </div>
+      <div class="row">
+        <span class="status-pill"><span id="syncDot" class="dot"></span><span id="syncLabel">Local</span></span>
+        <button id="copyInvite" class="ghost" type="button">Copy invite</button>
+      </div>
+    </header>
+
+    <div class="trip-name">
+      <input id="tripName" aria-label="Trip name" maxlength="80">
+      <span class="status-pill">Trip ID: <span id="tripIdLabel"></span></span>
+    </div>
+
+    <nav class="tabs" aria-label="TripShare sections">
+      <button class="tab active" data-tab="dashboard" type="button">Dashboard</button>
+      <button class="tab" data-tab="expenses" type="button">Expenses</button>
+      <button class="tab" data-tab="people" type="button">People</button>
+      <button class="tab" data-tab="settle" type="button">Settle</button>
+      <button class="tab" data-tab="history" type="button">History</button>
+      <button class="tab" data-tab="sync" type="button">Sync</button>
+    </nav>
+
+    <section id="dashboard" class="section active">
+      <div class="stats">
+        <div class="stat"><span>Total spend</span><strong id="totalSpend">GBP 0.00</strong></div>
+        <div class="stat"><span>Expenses</span><strong id="expenseCount">0</strong></div>
+        <div class="stat"><span>Participants</span><strong id="personCount">0</strong></div>
+      </div>
+      <div class="grid">
+        <div class="panel">
+          <h2>Balances</h2>
+          <div id="balanceWrap"></div>
+        </div>
+        <div class="panel">
+          <h2>Categories</h2>
+          <div id="categoryBars" class="category-bars"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="expenses" class="section">
+      <div class="grid">
+        <form id="expenseForm" class="panel">
+          <h2 id="expenseFormTitle">Add expense</h2>
+          <input id="editingExpenseId" type="hidden">
+          <div class="form-grid">
+            <label>Date <input id="expenseDate" type="date" required></label>
+            <label>Amount <input id="expenseAmount" type="number" step="0.01" min="0.01" required></label>
+            <label class="wide">Description <input id="expenseDescription" maxlength="120" required></label>
+            <label>Paid by <select id="paidBy" required></select></label>
+            <label>Category
+              <select id="category">
+                <option>Food</option>
+                <option>Drinks</option>
+                <option>Hotel</option>
+                <option>Fuel</option>
+                <option>Activities</option>
+                <option>Shopping</option>
+                <option>Transport</option>
+                <option>Other</option>
+              </select>
+            </label>
+            <label>Split type
+              <select id="splitType">
+                <option value="equal">Equal</option>
+                <option value="ratio">Ratio</option>
+              </select>
+            </label>
+            <div class="wide">
+              <h3>Shared by</h3>
+              <div id="shareChips" class="chips"></div>
+              <div id="ratioWeights" class="ratio-grid hidden"></div>
+            </div>
+          </div>
+          <div class="toolbar">
+            <button id="cancelEditExpense" class="ghost hidden" type="button">Cancel edit</button>
+            <button class="accent" type="submit">Save expense</button>
+          </div>
+        </form>
+        <div class="panel">
+          <div class="row" style="justify-content: space-between;">
+            <h2 style="margin-bottom:0;">Expenses</h2>
+            <button id="exportCsv" class="ghost" type="button">Export CSV</button>
+          </div>
+          <div id="expenseList" class="expense-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="people" class="section">
+      <div class="grid">
+        <form id="personForm" class="panel">
+          <h2>Add participant</h2>
+          <div class="row">
+            <input id="personName" maxlength="40" placeholder="Name" required>
+            <button class="accent" type="submit">Add</button>
+          </div>
+        </form>
+        <div class="panel">
+          <div class="row" style="justify-content: space-between;">
+            <h2 style="margin-bottom:0;">Participants</h2>
+            <button id="undoBtn" class="ghost" type="button" disabled>Undo</button>
+          </div>
+          <div id="participantList" class="participant-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="settle" class="section">
+      <div class="grid">
+        <div class="panel">
+          <h2>Settlements</h2>
+          <div id="settlements" class="settlement-list"></div>
+          <div class="toolbar">
+            <button id="copySettlements" class="accent" type="button">Copy settlements</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Export</h2>
+          <div class="row">
+            <button id="exportJson" class="ghost" type="button">Export JSON</button>
+            <label class="ghost" style="display:inline-flex; border:1px solid var(--line); border-radius:8px; padding:9px 12px; min-height:38px; cursor:pointer; color:var(--ink);">
+              Import JSON
+              <input id="importJson" type="file" accept="application/json,.json" class="hidden">
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="history" class="section">
+      <div class="panel">
+        <h2>Audit log</h2>
+        <div id="auditLog" class="audit-list"></div>
+      </div>
+    </section>
+
+    <section id="sync" class="section">
+      <div class="grid">
+        <form id="syncForm" class="panel">
+          <h2>Supabase sync</h2>
+          <div class="notice">Use the included SQL schema, then paste your Supabase project URL and anon key here.</div>
+          <div class="form-grid">
+            <label class="wide">Supabase URL <input id="supabaseUrl" placeholder="https://project.supabase.co"></label>
+            <label class="wide">Anon key <textarea id="supabaseAnonKey" spellcheck="false"></textarea></label>
+          </div>
+          <div class="toolbar">
+            <button id="disconnectSync" class="ghost" type="button">Disconnect</button>
+            <button class="accent" type="submit">Connect</button>
+          </div>
+        </form>
+        <div class="panel">
+          <h2>Invite link</h2>
+          <input id="inviteLink" readonly>
+          <div class="toolbar">
+            <button id="newTrip" class="ghost" type="button">New trip ID</button>
+            <button id="copyInvite2" class="accent" type="button">Copy invite</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="removeDialog" class="modal">
+    <div class="modal-body">
+      <h2 id="removeTitle">Remove participant</h2>
+      <div id="removeSummary" class="notice"></div>
+      <div class="toolbar">
+        <button id="cancelRemove" class="ghost" type="button">Cancel</button>
+        <button id="confirmRemove" class="danger" type="button">Remove participant</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module">
+    const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+    const today = new Date().toISOString().slice(0, 10);
+    const categories = ["Food", "Drinks", "Hotel", "Fuel", "Activities", "Shopping", "Transport", "Other"];
+    const defaultState = {
+      tripName: "Wales/Fargo Trip",
+      people: ["Anurag", "Karthik", "Sachin", "Sunny"],
+      expenses: [],
+      audit: [],
+      nextExpenseId: 1
+    };
+
+    let tripId = getTripId();
+    let state = loadState();
+    let lastSnapshot = null;
+    let pendingRemoveName = null;
+    let supabase = null;
+    let subscription = null;
+    let applyingRemote = false;
+    let saveTimer = null;
+
+    const el = (id) => document.getElementById(id);
+
+    function getTripId() {
+      const fromHash = location.hash.replace(/^#\/?trip\//, "").replace(/^#/, "").trim();
+      if (fromHash) return fromHash;
+      const generated = "trip-" + Math.random().toString(36).slice(2, 8);
+      history.replaceState(null, "", "#trip/" + generated);
+      return generated;
+    }
+
+    function storageKey() {
+      return "tripshare:v2:" + tripId;
+    }
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(storageKey());
+        if (saved) return normalizeState(JSON.parse(saved));
+      } catch (error) {
+        console.warn(error);
+      }
+      const seeded = clone(defaultState);
+      seeded.audit.push(auditEvent("Trip created"));
+      return seeded;
+    }
+
+    function normalizeState(value) {
+      return {
+        tripName: value.tripName || defaultState.tripName,
+        people: Array.isArray(value.people) ? value.people : [],
+        expenses: Array.isArray(value.expenses) ? value.expenses : [],
+        audit: Array.isArray(value.audit) ? value.audit : [],
+        nextExpenseId: Number(value.nextExpenseId || 1)
+      };
+    }
+
+    function auditEvent(text) {
+      return { id: crypto.randomUUID(), at: new Date().toISOString(), text };
+    }
+
+    function snapshot() {
+      lastSnapshot = JSON.stringify(state);
+      el("undoBtn").disabled = false;
+    }
+
+    function restoreSnapshot() {
+      if (!lastSnapshot) return;
+      state = normalizeState(JSON.parse(lastSnapshot));
+      lastSnapshot = null;
+      state.audit.unshift(auditEvent("Undid last action"));
+      el("undoBtn").disabled = true;
+      saveAndRender();
+    }
+
+    function saveAndRender() {
+      localStorage.setItem(storageKey(), JSON.stringify(state));
+      render();
+      scheduleCloudSave();
+    }
+
+    function scheduleCloudSave() {
+      if (!supabase || applyingRemote) return;
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(saveToCloud, 450);
+    }
+
+    async function saveToCloud() {
+      if (!supabase) return;
+      const payload = {
+        id: tripId,
+        trip_name: state.tripName,
+        payload: state,
+        updated_at: new Date().toISOString()
+      };
+      const { error } = await supabase.from("trip_documents").upsert(payload);
+      if (error) setSyncStatus("Local", false, error.message);
+    }
+
+    function render() {
+      el("tripIdLabel").textContent = tripId;
+      el("tripName").value = state.tripName;
+      el("inviteLink").value = location.href;
+      el("expenseDate").value ||= today;
+
+      renderParticipants();
+      renderExpenseFormPeople();
+      renderExpenses();
+      renderDashboard();
+      renderSettlements();
+      renderAudit();
+    }
+
+    function renderParticipants() {
+      el("personCount").textContent = state.people.length;
+      const wrap = el("participantList");
+      if (!state.people.length) {
+        wrap.innerHTML = '<div class="empty">No participants yet.</div>';
+        return;
+      }
+      wrap.innerHTML = state.people.map((name) => {
+        const paid = sum(state.expenses.filter(e => e.paidBy === name).map(e => e.amount));
+        const shared = state.expenses.filter(e => e.splitShares && Object.hasOwn(e.splitShares, name)).length;
+        return `
+          <div class="person">
+            <div>
+              <strong>${escapeHtml(name)}</strong>
+              <div class="meta">Paid ${currency.format(paid)} &middot; shared in ${shared} expenses</div>
+            </div>
+            <button class="ghost remove-person" data-name="${escapeAttr(name)}" type="button">Remove</button>
+          </div>
+        `;
+      }).join("");
+      document.querySelectorAll(".remove-person").forEach(btn => {
+        btn.addEventListener("click", () => openRemoveDialog(btn.dataset.name));
+      });
+    }
+
+    function renderExpenseFormPeople() {
+      const paidBy = el("paidBy");
+      paidBy.innerHTML = state.people.map(name => `<option>${escapeHtml(name)}</option>`).join("");
+
+      const shareChips = el("shareChips");
+      shareChips.innerHTML = state.people.map(name => `
+        <label class="chip">
+          <input type="checkbox" name="sharedBy" value="${escapeAttr(name)}" checked>
+          ${escapeHtml(name)}
+        </label>
+      `).join("");
+      document.querySelectorAll('input[name="sharedBy"]').forEach(input => {
+        input.addEventListener("change", renderRatioInputs);
+      });
+      renderRatioInputs();
+    }
+
+    function renderRatioInputs() {
+      const isRatio = el("splitType").value === "ratio";
+      const ratioWrap = el("ratioWeights");
+      ratioWrap.classList.toggle("hidden", !isRatio);
+      const selected = selectedParticipants();
+      ratioWrap.innerHTML = selected.map(name => `
+        <label>${escapeHtml(name)}
+          <input type="number" min="0.01" step="0.01" value="1" data-ratio-for="${escapeAttr(name)}">
+        </label>
+      `).join("");
+    }
+
+    function renderExpenses() {
+      el("expenseCount").textContent = state.expenses.length;
+      const wrap = el("expenseList");
+      if (!state.expenses.length) {
+        wrap.innerHTML = '<div class="empty">No expenses yet.</div>';
+        return;
+      }
+      wrap.innerHTML = [...state.expenses].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id).map(exp => {
+        const participants = Object.keys(exp.splitShares || {});
+        return `
+          <article class="expense">
+            <div>
+              <strong>${escapeHtml(exp.description)}</strong>
+              <div class="meta">${escapeHtml(exp.date)} &middot; ${escapeHtml(exp.category)} &middot; paid by ${escapeHtml(exp.paidBy)}</div>
+              <div class="meta">${escapeHtml(exp.splitType)} split with ${participants.map(escapeHtml).join(", ")}</div>
+              <div class="small-actions">
+                <button class="ghost edit-expense" data-id="${exp.id}" type="button">Edit</button>
+                <button class="ghost delete-expense" data-id="${exp.id}" type="button">Delete</button>
+              </div>
+            </div>
+            <div class="amount">${currency.format(exp.amount)}</div>
+          </article>
+        `;
+      }).join("");
+      document.querySelectorAll(".edit-expense").forEach(btn => btn.addEventListener("click", () => editExpense(Number(btn.dataset.id))));
+      document.querySelectorAll(".delete-expense").forEach(btn => btn.addEventListener("click", () => deleteExpense(Number(btn.dataset.id))));
+    }
+
+    function renderDashboard() {
+      const total = sum(state.expenses.map(e => e.amount));
+      el("totalSpend").textContent = currency.format(total);
+      const balances = calculateBalances();
+      if (!state.people.length) {
+        el("balanceWrap").innerHTML = '<div class="empty">Add participants to see balances.</div>';
+      } else {
+        el("balanceWrap").innerHTML = `
+          <table class="balance-table">
+            <thead><tr><th>Name</th><th>Paid</th><th>Owes</th><th>Balance</th></tr></thead>
+            <tbody>${state.people.map(name => `
+              <tr>
+                <td>${escapeHtml(name)}</td>
+                <td>${currency.format(balances[name].paid)}</td>
+                <td>${currency.format(balances[name].owes)}</td>
+                <td class="${balances[name].net >= 0 ? "positive" : "negative"}">${currency.format(balances[name].net)}</td>
+              </tr>
+            `).join("")}</tbody>
+          </table>
+        `;
+      }
+      renderCategoryBars(total);
+    }
+
+    function renderCategoryBars(total) {
+      const totals = Object.fromEntries(categories.map(category => [category, 0]));
+      for (const exp of state.expenses) totals[exp.category || "Other"] = (totals[exp.category || "Other"] || 0) + exp.amount;
+      const rows = Object.entries(totals).filter(([, value]) => value > 0).sort((a, b) => b[1] - a[1]);
+      el("categoryBars").innerHTML = rows.length ? rows.map(([category, value]) => `
+        <div class="bar-row">
+          <span>${escapeHtml(category)}</span>
+          <div class="bar"><span style="width:${total ? Math.max(4, value / total * 100) : 0}%"></span></div>
+          <strong>${currency.format(value)}</strong>
+        </div>
+      `).join("") : '<div class="empty">No category spend yet.</div>';
+    }
+
+    function renderSettlements() {
+      const settlements = calculateSettlements();
+      const wrap = el("settlements");
+      if (!settlements.length) {
+        wrap.innerHTML = '<div class="empty">Everyone is settled.</div>';
+        return;
+      }
+      wrap.innerHTML = settlements.map(item => `
+        <div class="settlement"><strong>${escapeHtml(item.from)} pays ${currency.format(item.amount)} to ${escapeHtml(item.to)}</strong></div>
+      `).join("");
+    }
+
+    function renderAudit() {
+      const wrap = el("auditLog");
+      if (!state.audit.length) {
+        wrap.innerHTML = '<div class="empty">No activity yet.</div>';
+        return;
+      }
+      wrap.innerHTML = state.audit.slice(0, 80).map(item => `
+        <div class="audit-item">
+          <strong>${escapeHtml(item.text)}</strong>
+          <div class="meta">${new Date(item.at).toLocaleString()}</div>
+        </div>
+      `).join("");
+    }
+
+    function calculateBalances() {
+      const balances = Object.fromEntries(state.people.map(name => [name, { paid: 0, owes: 0, net: 0 }]));
+      for (const exp of state.expenses) {
+        if (balances[exp.paidBy]) balances[exp.paidBy].paid += exp.amount;
+        for (const [name, share] of Object.entries(exp.splitShares || {})) {
+          if (balances[name]) balances[name].owes += exp.amount * share;
+        }
+      }
+      for (const name of Object.keys(balances)) {
+        balances[name].net = roundMoney(balances[name].paid - balances[name].owes);
+      }
+      return balances;
+    }
+
+    function calculateSettlements() {
+      const balances = calculateBalances();
+      const debtors = [];
+      const creditors = [];
+      for (const [name, data] of Object.entries(balances)) {
+        if (data.net < -0.005) debtors.push({ name, amount: -data.net });
+        if (data.net > 0.005) creditors.push({ name, amount: data.net });
+      }
+      debtors.sort((a, b) => b.amount - a.amount);
+      creditors.sort((a, b) => b.amount - a.amount);
+      const settlements = [];
+      let d = 0;
+      let c = 0;
+      while (d < debtors.length && c < creditors.length) {
+        const amount = roundMoney(Math.min(debtors[d].amount, creditors[c].amount));
+        if (amount > 0) settlements.push({ from: debtors[d].name, to: creditors[c].name, amount });
+        debtors[d].amount = roundMoney(debtors[d].amount - amount);
+        creditors[c].amount = roundMoney(creditors[c].amount - amount);
+        if (debtors[d].amount <= 0.005) d++;
+        if (creditors[c].amount <= 0.005) c++;
+      }
+      return settlements;
+    }
+
+    function selectedParticipants() {
+      return [...document.querySelectorAll('input[name="sharedBy"]:checked')].map(input => input.value);
+    }
+
+    function splitShares() {
+      const selected = selectedParticipants();
+      if (!selected.length) throw new Error("Choose at least one participant.");
+      if (el("splitType").value === "equal") {
+        const share = 1 / selected.length;
+        return {
+          splitShares: Object.fromEntries(selected.map(name => [name, share])),
+          ratioWeights: null
+        };
+      }
+      const weights = {};
+      for (const name of selected) {
+        const input = document.querySelector(`[data-ratio-for="${cssEscape(name)}"]`);
+        const value = Number(input?.value || 0);
+        if (value <= 0) throw new Error("Ratio weights must be greater than zero.");
+        weights[name] = value;
+      }
+      const total = sum(Object.values(weights));
+      return {
+        splitShares: Object.fromEntries(Object.entries(weights).map(([name, weight]) => [name, weight / total])),
+        ratioWeights: weights
+      };
+    }
+
+    function addOrUpdateExpense(event) {
+      event.preventDefault();
+      if (!state.people.length) {
+        alert("Add at least one participant first.");
+        return;
+      }
+      let split;
+      try {
+        split = splitShares();
+      } catch (error) {
+        alert(error.message);
+        return;
+      }
+      const id = Number(el("editingExpenseId").value || 0);
+      const expense = {
+        id: id || state.nextExpenseId++,
+        date: el("expenseDate").value || today,
+        description: el("expenseDescription").value.trim(),
+        amount: roundMoney(Number(el("expenseAmount").value)),
+        paidBy: el("paidBy").value,
+        category: el("category").value,
+        splitType: el("splitType").value,
+        splitShares: split.splitShares,
+        ratioWeights: split.ratioWeights
+      };
+      if (!expense.description || expense.amount <= 0) return;
+      snapshot();
+      const existingIndex = state.expenses.findIndex(item => item.id === id);
+      if (existingIndex >= 0) {
+        state.expenses[existingIndex] = expense;
+        state.audit.unshift(auditEvent(`Edited ${expense.description}`));
+      } else {
+        state.expenses.push(expense);
+        state.audit.unshift(auditEvent(`Added ${expense.description}`));
+      }
+      resetExpenseForm();
+      saveAndRender();
+    }
+
+    function editExpense(id) {
+      const exp = state.expenses.find(item => item.id === id);
+      if (!exp) return;
+      el("editingExpenseId").value = exp.id;
+      el("expenseFormTitle").textContent = "Edit expense";
+      el("cancelEditExpense").classList.remove("hidden");
+      el("expenseDate").value = exp.date;
+      el("expenseDescription").value = exp.description;
+      el("expenseAmount").value = exp.amount;
+      el("paidBy").value = exp.paidBy;
+      el("category").value = exp.category;
+      el("splitType").value = exp.splitType;
+      document.querySelectorAll('input[name="sharedBy"]').forEach(input => {
+        input.checked = Object.hasOwn(exp.splitShares || {}, input.value);
+      });
+      renderRatioInputs();
+      if (exp.ratioWeights) {
+        for (const [name, value] of Object.entries(exp.ratioWeights)) {
+          const input = document.querySelector(`[data-ratio-for="${cssEscape(name)}"]`);
+          if (input) input.value = value;
+        }
+      }
+      document.querySelector('[data-tab="expenses"]').click();
+      el("expenseDescription").focus();
+    }
+
+    function deleteExpense(id) {
+      const exp = state.expenses.find(item => item.id === id);
+      if (!exp || !confirm(`Delete "${exp.description}"?`)) return;
+      snapshot();
+      state.expenses = state.expenses.filter(item => item.id !== id);
+      state.audit.unshift(auditEvent(`Deleted ${exp.description}`));
+      saveAndRender();
+    }
+
+    function resetExpenseForm() {
+      el("expenseForm").reset();
+      el("expenseDate").value = today;
+      el("editingExpenseId").value = "";
+      el("expenseFormTitle").textContent = "Add expense";
+      el("cancelEditExpense").classList.add("hidden");
+      renderExpenseFormPeople();
+    }
+
+    function addPerson(event) {
+      event.preventDefault();
+      const name = el("personName").value.trim();
+      if (!name) return;
+      if (state.people.some(existing => existing.toLowerCase() === name.toLowerCase())) {
+        alert("That participant already exists.");
+        return;
+      }
+      snapshot();
+      state.people.push(name);
+      state.audit.unshift(auditEvent(`Added participant ${name}`));
+      el("personForm").reset();
+      saveAndRender();
+    }
+
+    function openRemoveDialog(name) {
+      const remaining = state.people.filter(person => person !== name);
+      if (!remaining.length) {
+        alert("Cannot remove the last participant.");
+        return;
+      }
+      pendingRemoveName = name;
+      const paid = state.expenses.filter(exp => exp.paidBy === name);
+      const shared = state.expenses.filter(exp => exp.splitShares && Object.hasOwn(exp.splitShares, name));
+      el("removeTitle").textContent = `Remove ${name}`;
+      el("removeSummary").innerHTML = `
+        Expenses paid by ${escapeHtml(name)}: <strong>${paid.length}</strong><br>
+        Value paid: <strong>${currency.format(sum(paid.map(exp => exp.amount)))}</strong><br>
+        Expenses shared by ${escapeHtml(name)}: <strong>${shared.length}</strong>
+      `;
+      el("removeDialog").showModal();
+    }
+
+    function removeParticipant() {
+      const name = pendingRemoveName;
+      if (!name) return;
+      snapshot();
+      const updated = [];
+      for (const exp of state.expenses) {
+        if (exp.paidBy === name) continue;
+        if (!exp.splitShares || !Object.hasOwn(exp.splitShares, name)) {
+          updated.push(exp);
+          continue;
+        }
+        const next = clone(exp);
+        if (next.splitType === "ratio" && next.ratioWeights) {
+          delete next.ratioWeights[name];
+          const totalWeight = sum(Object.values(next.ratioWeights));
+          next.splitShares = Object.fromEntries(Object.entries(next.ratioWeights).map(([person, weight]) => [person, weight / totalWeight]));
+        } else {
+          delete next.splitShares[name];
+          const participants = Object.keys(next.splitShares);
+          const equalShare = 1 / participants.length;
+          next.splitShares = Object.fromEntries(participants.map(person => [person, equalShare]));
+        }
+        if (Object.keys(next.splitShares).length) updated.push(next);
+      }
+      state.people = state.people.filter(person => person !== name);
+      state.expenses = updated;
+      state.audit.unshift(auditEvent(`Removed participant ${name}`));
+      pendingRemoveName = null;
+      el("removeDialog").close();
+      saveAndRender();
+    }
+
+    async function connectSupabase(event) {
+      event?.preventDefault();
+      const url = el("supabaseUrl").value.trim();
+      const key = el("supabaseAnonKey").value.trim();
+      if (!url || !key) return;
+      localStorage.setItem("tripshare:supabase:url", url);
+      localStorage.setItem("tripshare:supabase:key", key);
+      try {
+        const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm");
+        supabase = createClient(url, key);
+        setSyncStatus("Connecting", false);
+        const { data, error } = await supabase.from("trip_documents").select("payload").eq("id", tripId).maybeSingle();
+        if (error) throw error;
+        if (data?.payload) {
+          applyingRemote = true;
+          state = normalizeState(data.payload);
+          localStorage.setItem(storageKey(), JSON.stringify(state));
+          applyingRemote = false;
+        } else {
+          await saveToCloud();
+        }
+        await subscribeToTrip();
+        setSyncStatus("Live sync", true);
+        render();
+      } catch (error) {
+        supabase = null;
+        setSyncStatus("Local", false, error.message);
+        alert(error.message);
+      }
+    }
+
+    async function subscribeToTrip() {
+      if (subscription) await subscription.unsubscribe();
+      subscription = supabase.channel("trip_documents:" + tripId)
+        .on("postgres_changes", { event: "*", schema: "public", table: "trip_documents", filter: `id=eq.${tripId}` }, payload => {
+          if (!payload.new?.payload) return;
+          applyingRemote = true;
+          state = normalizeState(payload.new.payload);
+          localStorage.setItem(storageKey(), JSON.stringify(state));
+          render();
+          applyingRemote = false;
+        })
+        .subscribe();
+    }
+
+    async function disconnectSync() {
+      if (subscription) await subscription.unsubscribe();
+      subscription = null;
+      supabase = null;
+      localStorage.removeItem("tripshare:supabase:url");
+      localStorage.removeItem("tripshare:supabase:key");
+      setSyncStatus("Local", false);
+    }
+
+    function setSyncStatus(label, live, title = "") {
+      el("syncLabel").textContent = label;
+      el("syncDot").classList.toggle("live", live);
+      el("syncLabel").title = title;
+    }
+
+    function exportCsv() {
+      const rows = [["Date", "Description", "Category", "Amount", "Paid By", "Split Type", "Shared By"]];
+      for (const exp of state.expenses) {
+        rows.push([exp.date, exp.description, exp.category, exp.amount, exp.paidBy, exp.splitType, Object.keys(exp.splitShares || {}).join("; ")]);
+      }
+      download("tripshare-expenses.csv", rows.map(row => row.map(csvCell).join(",")).join("\n"), "text/csv");
+    }
+
+    function exportJson() {
+      download("tripshare-state.json", JSON.stringify({ tripId, ...state }, null, 2), "application/json");
+    }
+
+    function importJson(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          snapshot();
+          const parsed = JSON.parse(reader.result);
+          state = normalizeState(parsed);
+          state.audit.unshift(auditEvent("Imported JSON"));
+          saveAndRender();
+        } catch (error) {
+          alert(error.message);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    function download(name, text, type) {
+      const blob = new Blob([text], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function csvCell(value) {
+      return `"${String(value ?? "").replaceAll('"', '""')}"`;
+    }
+
+    function copyInvite() {
+      navigator.clipboard.writeText(location.href);
+    }
+
+    function copySettlements() {
+      const text = calculateSettlements().map(item => `${item.from} pays ${currency.format(item.amount)} to ${item.to}`).join("\n") || "Everyone is settled.";
+      navigator.clipboard.writeText(text);
+    }
+
+    function newTripId() {
+      if (!confirm("Create a new empty trip ID? Current trip data stays saved under the old link.")) return;
+      tripId = "trip-" + Math.random().toString(36).slice(2, 8);
+      history.replaceState(null, "", "#trip/" + tripId);
+      state = loadState();
+      lastSnapshot = null;
+      render();
+    }
+
+    function sum(values) {
+      return values.reduce((total, value) => total + Number(value || 0), 0);
+    }
+
+    function clone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function roundMoney(value) {
+      return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replaceAll("`", "&#096;");
+    }
+
+    function cssEscape(value) {
+      if (window.CSS?.escape) return CSS.escape(value);
+      return String(value).replace(/["\\]/g, "\\$&");
+    }
+
+    document.querySelectorAll(".tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab === btn));
+        document.querySelectorAll(".section").forEach(section => section.classList.toggle("active", section.id === btn.dataset.tab));
+      });
+    });
+
+    el("tripName").addEventListener("change", () => {
+      snapshot();
+      state.tripName = el("tripName").value.trim() || "TripShare";
+      state.audit.unshift(auditEvent("Renamed trip"));
+      saveAndRender();
+    });
+    el("expenseForm").addEventListener("submit", addOrUpdateExpense);
+    el("personForm").addEventListener("submit", addPerson);
+    el("splitType").addEventListener("change", renderRatioInputs);
+    el("cancelEditExpense").addEventListener("click", resetExpenseForm);
+    el("undoBtn").addEventListener("click", restoreSnapshot);
+    el("confirmRemove").addEventListener("click", removeParticipant);
+    el("cancelRemove").addEventListener("click", () => el("removeDialog").close());
+    el("copyInvite").addEventListener("click", copyInvite);
+    el("copyInvite2").addEventListener("click", copyInvite);
+    el("copySettlements").addEventListener("click", copySettlements);
+    el("exportCsv").addEventListener("click", exportCsv);
+    el("exportJson").addEventListener("click", exportJson);
+    el("importJson").addEventListener("change", importJson);
+    el("newTrip").addEventListener("click", newTripId);
+    el("syncForm").addEventListener("submit", connectSupabase);
+    el("disconnectSync").addEventListener("click", disconnectSync);
+
+    el("supabaseUrl").value = localStorage.getItem("tripshare:supabase:url") || "";
+    el("supabaseAnonKey").value = localStorage.getItem("tripshare:supabase:key") || "";
+
+    render();
+    if (el("supabaseUrl").value && el("supabaseAnonKey").value) connectSupabase();
+  </script>
+</body>
+</html>
