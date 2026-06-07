@@ -637,7 +637,7 @@
     const categories = ["Food", "Drinks", "Hotel", "Fuel", "Activities", "Shopping", "Transport", "Other"];
     const defaultState = {
       tripName: "<Trip Name>",
-      people: ["Person1", "Person2", "Person3", "Person4"],
+      people: ["Person1", "Person2"],
       expenses: [],
       audit: [],
       nextExpenseId: 1
@@ -690,8 +690,8 @@
 
     function migrateDefaultLabels(value) {
       const hasOldSeedData =
-        value.tripName === "Wales/Fargo Trip" &&
-        value.people.join("|") === "Anurag|Karthik|Sachin|Sunny" &&
+        value.tripName === "<Trip Name>" &&
+        value.people.join("|") === "Person1|Person2" &&
         value.expenses.length === 0;
       if (!hasOldSeedData) return value;
       value.tripName = defaultState.tripName;
