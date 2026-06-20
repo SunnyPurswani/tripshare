@@ -744,7 +744,7 @@
     function render() {
       el("tripIdLabel").textContent = tripId;
       el("tripName").value = state.tripName;
-      el("inviteLink").value = location.href;
+      el("inviteLink").value = buildInviteLink();
       el("expenseDate").value ||= today;
 
       renderParticipants();
