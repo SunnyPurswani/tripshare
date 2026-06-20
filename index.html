@@ -1220,12 +1220,33 @@
     }
 
     function copyInvite() {
-      navigator.clipboard.writeText(location.href);
+      navigator.clipboard.writeText(buildInviteLink());
     }
 
     function copySettlements() {
       const text = calculateSettlements().map(item => `${item.from} pays ${currency.format(item.amount)} to ${item.to}`).join("\n") || "Everyone is settled.";
       navigator.clipboard.writeText(text);
+    }
+
+    function buildInviteLink() {
+      const url = new URL(location.href);
+      const supabaseUrl = el("supabaseUrl").value.trim();
+      const supabaseKey = el("supabaseAnonKey").value.trim();
+      if (supabaseUrl && supabaseKey) {
+        url.searchParams.set("sbUrl", supabaseUrl);
+        url.searchParams.set("sbKey", supabaseKey);
+      }
+      url.hash = "#trip/" + tripId;
+      return url.toString();
+    }
+
+    function readInviteSyncConfig() {
+      const params = new URLSearchParams(location.search);
+      const supabaseUrl = params.get("sbUrl");
+      const supabaseKey = params.get("sbKey");
+      if (!supabaseUrl || !supabaseKey) return;
+      localStorage.setItem("tripshare:supabase:url", supabaseUrl);
+      localStorage.setItem("tripshare:supabase:key", supabaseKey);
     }
 
     function newTripId() {
@@ -1292,6 +1313,7 @@
     el("syncForm").addEventListener("submit", connectSupabase);
     el("disconnectSync").addEventListener("click", disconnectSync);
 
+    readInviteSyncConfig();
     el("supabaseUrl").value = localStorage.getItem("tripshare:supabase:url") || "";
     el("supabaseAnonKey").value = localStorage.getItem("tripshare:supabase:key") || "";
 
