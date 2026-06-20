@@ -615,6 +615,16 @@
             <button id="newTrip" class="ghost" type="button">New trip ID</button>
             <button id="copyInvite2" class="accent" type="button">Copy invite</button>
           </div>
+          <h3 style="margin-top:18px;">Short invite</h3>
+          <div class="row">
+            <input id="shortSlug" maxlength="32" placeholder="dexter">
+            <button id="randomSlug" class="ghost" type="button">Random name</button>
+          </div>
+          <input id="shortInviteLink" readonly style="margin-top:8px;">
+          <div class="toolbar">
+            <button id="saveShortInvite" class="accent" type="button">Save short link</button>
+            <button id="copyShortInvite" class="ghost" type="button">Copy short link</button>
+          </div>
         </div>
       </div>
     </section>
@@ -635,6 +645,13 @@
     const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
     const today = new Date().toISOString().slice(0, 10);
     const categories = ["Food", "Drinks", "Hotel", "Fuel", "Activities", "Shopping", "Transport", "Other"];
+    const APP_SUPABASE_URL = "https://cusegeussklgueqpwkbz.supabase.co";
+    const APP_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1c2VnZXVzc2tsZ3VlcXB3a2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTc1MDksImV4cCI6MjA5NzQ3MzUwOX0.HOO_Ko5Rk9fKDVXEwGDZye5JupcvIwewH50tN19JRXE";
+    const easyWords = [
+      "daffodil", "dexter", "roma", "crazydays", "sunbeam", "mango", "atlas", "jasper",
+      "pebble", "violet", "orbit", "maple", "pixel", "cobalt", "breeze", "lotus",
+      "tango", "ember", "olive", "harbor", "meadow", "nova", "saffron", "rocket"
+    ];
     const defaultState = {
       tripName: "<Trip Name>",
       people: ["Person1", "Person2"],
@@ -643,6 +660,7 @@
       nextExpenseId: 1
     };
 
+    let joinSlug = getJoinSlug();
     let tripId = getTripId();
     let state = loadState();
     let lastSnapshot = null;
@@ -654,7 +672,13 @@
 
     const el = (id) => document.getElementById(id);
 
+    function getJoinSlug() {
+      const match = location.hash.match(/^#\/?join\/([a-z0-9-]+)$/i);
+      return match ? match[1].toLowerCase() : "";
+    }
+
     function getTripId() {
+      if (joinSlug) return "pending-" + joinSlug;
       const fromHash = location.hash.replace(/^#\/?trip\//, "").replace(/^#/, "").trim();
       if (fromHash) return fromHash;
       const generated = "trip-" + Math.random().toString(36).slice(2, 8);
@@ -745,6 +769,7 @@
       el("tripIdLabel").textContent = tripId;
       el("tripName").value = state.tripName;
       el("inviteLink").value = buildInviteLink();
+      el("shortInviteLink").value = buildShortInviteLink(el("shortSlug").value.trim());
       el("expenseDate").value ||= today;
 
       renderParticipants();
@@ -1125,6 +1150,7 @@
         const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm");
         supabase = createClient(url, key);
         setSyncStatus("Connecting", false);
+        if (joinSlug) await resolveShortInvite(joinSlug);
         const { data, error } = await supabase.from("trip_documents").select("payload").eq("id", tripId).maybeSingle();
         if (error) throw error;
         if (data?.payload) {
@@ -1143,6 +1169,20 @@
         setSyncStatus("Local", false, error.message);
         alert(error.message);
       }
+    }
+
+    async function resolveShortInvite(slug) {
+      const { data, error } = await supabase
+        .from("short_links")
+        .select("trip_id, full_url")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data?.trip_id) throw new Error(`Short invite "${slug}" was not found.`);
+      tripId = data.trip_id;
+      joinSlug = "";
+      history.replaceState(null, "", "#trip/" + tripId);
+      state = loadState();
     }
 
     async function subscribeToTrip() {
@@ -1240,10 +1280,90 @@
       return url.toString();
     }
 
+    function buildShortInviteLink(slug) {
+      const cleanSlug = normalizeSlug(slug);
+      if (!cleanSlug) return "";
+      const url = new URL(location.href);
+      url.search = "";
+      url.hash = "#join/" + cleanSlug;
+      return url.toString();
+    }
+
+    function randomEasySlug() {
+      return easyWords[Math.floor(Math.random() * easyWords.length)];
+    }
+
+    function normalizeSlug(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 32);
+    }
+
+    async function saveShortInvite() {
+      if (!supabase) {
+        await connectSupabase();
+      }
+      if (!supabase) {
+        alert("Connect Supabase before saving a short invite.");
+        return;
+      }
+      let slug = normalizeSlug(el("shortSlug").value);
+      if (!slug) slug = randomEasySlug();
+      el("shortSlug").value = slug;
+
+      const defaultConfigReady = Boolean(APP_SUPABASE_URL && APP_SUPABASE_ANON_KEY);
+      if (!defaultConfigReady) {
+        alert("Short links need APP_SUPABASE_URL and APP_SUPABASE_ANON_KEY set in index.html before deployment, otherwise new browsers cannot resolve them.");
+      }
+
+      const existing = await supabase
+        .from("short_links")
+        .select("trip_id")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (existing.error) {
+        alert(existing.error.message);
+        return;
+      }
+      if (existing.data?.trip_id && existing.data.trip_id !== tripId) {
+        const overwrite = confirm(`"${slug}" already points to another trip. Replace it?`);
+        if (!overwrite) return;
+      }
+
+      const shortUrl = buildShortInviteLink(slug);
+      const { error } = await supabase.from("short_links").upsert({
+        slug,
+        trip_id: tripId,
+        full_url: buildInviteLink(),
+        updated_at: new Date().toISOString()
+      });
+      if (error) {
+        alert(error.message);
+        return;
+      }
+      el("shortInviteLink").value = shortUrl;
+      await navigator.clipboard.writeText(shortUrl);
+      state.audit.unshift(auditEvent(`Saved short invite ${slug}`));
+      saveAndRender();
+    }
+
+    function copyShortInvite() {
+      const slug = normalizeSlug(el("shortSlug").value);
+      const link = buildShortInviteLink(slug);
+      if (!link) {
+        alert("Add or generate a short name first.");
+        return;
+      }
+      navigator.clipboard.writeText(link);
+    }
+
     function readInviteSyncConfig() {
       const params = new URLSearchParams(location.search);
-      const supabaseUrl = params.get("sbUrl");
-      const supabaseKey = params.get("sbKey");
+      const supabaseUrl = params.get("sbUrl") || APP_SUPABASE_URL;
+      const supabaseKey = params.get("sbKey") || APP_SUPABASE_ANON_KEY;
       if (!supabaseUrl || !supabaseKey) return;
       localStorage.setItem("tripshare:supabase:url", supabaseUrl);
       localStorage.setItem("tripshare:supabase:key", supabaseKey);
@@ -1305,6 +1425,16 @@
     el("cancelRemove").addEventListener("click", () => el("removeDialog").close());
     el("copyInvite").addEventListener("click", copyInvite);
     el("copyInvite2").addEventListener("click", copyInvite);
+    el("randomSlug").addEventListener("click", () => {
+      el("shortSlug").value = randomEasySlug();
+      el("shortInviteLink").value = buildShortInviteLink(el("shortSlug").value);
+    });
+    el("shortSlug").addEventListener("input", () => {
+      el("shortSlug").value = normalizeSlug(el("shortSlug").value);
+      el("shortInviteLink").value = buildShortInviteLink(el("shortSlug").value);
+    });
+    el("saveShortInvite").addEventListener("click", saveShortInvite);
+    el("copyShortInvite").addEventListener("click", copyShortInvite);
     el("copySettlements").addEventListener("click", copySettlements);
     el("exportCsv").addEventListener("click", exportCsv);
     el("exportJson").addEventListener("click", exportJson);
