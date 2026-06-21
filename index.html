@@ -924,7 +924,7 @@
   <!-- ===== SCRIPT ===== -->
   <script type="module">
     /* ============================================================
-       TripShare v2 – with manual partial settlements
+       TripShare v2 – with manual partial settlements & negative‑zero fix
        ============================================================ */
 
     // ---------- constants ----------
@@ -944,7 +944,7 @@
       tripName: "My Trip",
       people: ["Alex", "Jamie"],
       expenses: [],
-      settlements: [], // manual settlements: { id, from, to, amount, date }
+      settlements: [],
       audit: [],
       nextExpenseId: 1,
       nextSettlementId: 1,
@@ -1161,7 +1161,6 @@
       renderAudit();
       updateSyncStatusDetail();
 
-      // populate settlement form selects
       populateSettlementSelects();
     }
 
@@ -1334,13 +1333,17 @@
               const settledReceived = sum(state.settlements.filter(s => s.to === name).map(s => s.amount));
               const settledPaid = sum(state.settlements.filter(s => s.from === name).map(s => s.amount));
               const settlementNet = settledReceived - settledPaid;
+              // Format balance: show 0 without negative sign if near zero
+              const net = b.net;
+              const displayNet = Math.abs(net) < 0.005 ? 0 : net;
+              const balanceClass = displayNet >= 0 ? "positive" : "negative";
               return `
                 <tr>
                   <td>${escapeHtml(name)}</td>
                   <td>${currency.format(b.paid)}</td>
                   <td>${currency.format(b.owes)}</td>
                   <td>${currency.format(settlementNet)}</td>
-                  <td class="${b.net >= 0 ? "positive" : "negative"}">${currency.format(b.net)}</td>
+                  <td class="${balanceClass}">${currency.format(displayNet)}</td>
                 </tr>
               `;
             }).join("")}</tbody>
@@ -1392,7 +1395,6 @@
         wrap.innerHTML = `<div class="empty-state"><span class="icon">💸</span>No manual settlements recorded.</div>`;
         return;
       }
-      // sort by date descending
       const sorted = [...state.settlements].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
       wrap.innerHTML = sorted.map(s => `
         <div class="list-item">
@@ -1455,16 +1457,12 @@
       // add manual settlements: if A pays B, A's net increases (debt reduced), B's net decreases (received)
       for (const s of state.settlements) {
         if (b[s.from] && b[s.to]) {
-          // from: they paid, so their net increases (less debt)
           b[s.from].net += s.amount;
-          // to: they received, so their net decreases (less receivable)
           b[s.to].net -= s.amount;
         }
       }
-      // now compute final net = paid - owes + settlement adjustment (already applied)
-      // but we also need to include the paid/owes for display; we'll set net as final
       for (const name of Object.keys(b)) {
-        b[name].net = roundMoney(b[name].paid - b[name].owes + b[name].net); // net already has settlement adjustment
+        b[name].net = roundMoney(b[name].paid - b[name].owes + b[name].net);
       }
       return b;
     }
@@ -1628,7 +1626,6 @@
       if (!name) return;
       snapshot();
 
-      // Remove from expenses (redistribute shares)
       const updated = [];
       for (const exp of state.expenses) {
         if (exp.paidBy === name) continue;
@@ -1654,7 +1651,6 @@
         if (Object.keys(next.splitShares).length) updated.push(next);
       }
 
-      // Remove from settlements
       const settlements = state.settlements.filter(s => s.from !== name && s.to !== name);
 
       state.people = state.people.filter(p => p !== name);
