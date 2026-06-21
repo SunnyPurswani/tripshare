@@ -99,7 +99,7 @@
       background: var(--ink);
       color: #fff;
       cursor: pointer;
-      min-height: 44px; /* larger touch target */
+      min-height: 44px;
       font-weight: 550;
       font-size: 14px;
       transition: background var(--transition), border-color var(--transition), transform var(--transition), box-shadow var(--transition);
@@ -139,9 +139,9 @@
       padding: 10px 12px;
       background: #fff;
       color: var(--ink);
-      min-height: 44px; /* larger touch target */
+      min-height: 44px;
       transition: border-color var(--transition), box-shadow var(--transition);
-      font-size: 16px; /* prevents iOS zoom */
+      font-size: 16px;
     }
     input:focus, select:focus, textarea:focus {
       outline: 0;
@@ -638,7 +638,7 @@
       .stat-card strong { font-size: 20px; }
       .ratio-grid { grid-template-columns: 1fr 1fr; }
       .toast-container { bottom: 12px; right: 12px; max-width: calc(100% - 24px); }
-      .trip-name-row .status-pill:last-child { display: none; } /* hide trip ID on small screens */
+      .trip-name-row .status-pill:last-child { display: none; }
     }
 
     @media (max-width: 600px) {
@@ -806,13 +806,41 @@
     <section id="settle" class="section">
       <div class="grid-2">
         <div class="panel">
-          <h2>Settlements</h2>
+          <h2>Record a payment (partial settlement)</h2>
+          <form id="settlementForm" class="form-grid" style="grid-template-columns:1fr 1fr; gap:10px;">
+            <label>From
+              <select id="settlementFrom" required>
+                <option value="">—</option>
+              </select>
+            </label>
+            <label>To
+              <select id="settlementTo" required>
+                <option value="">—</option>
+              </select>
+            </label>
+            <label>Amount
+              <input id="settlementAmount" type="number" step="0.01" min="0.01" required />
+            </label>
+            <label>Date
+              <input id="settlementDate" type="date" required />
+            </label>
+            <div class="wide" style="grid-column:1/-1; display:flex; gap:8px; justify-content:flex-end;">
+              <button type="submit" class="btn-accent">💸 Record payment</button>
+            </div>
+          </form>
+          <div style="margin-top:16px; border-top:1px solid var(--line); padding-top:14px;">
+            <h3>Manual settlements</h3>
+            <div id="manualSettlementsList" class="list"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Suggested remaining settlements</h2>
           <div id="settlements" class="list"></div>
           <div class="toolbar">
             <button id="copySettlements" class="btn-accent" type="button">📋 Copy settlements</button>
           </div>
-        </div>
-        <div class="panel">
+          <hr style="border:0;border-top:1px solid var(--line);margin:16px 0;" />
           <h2>Export / Import</h2>
           <div class="row" style="margin-bottom:10px;">
             <button id="exportJson" class="btn-ghost" type="button">⬇ Export JSON</button>
@@ -896,11 +924,10 @@
   <!-- ===== SCRIPT ===== -->
   <script type="module">
     /* ============================================================
-       TripShare v2 – final (mobile‑friendly)
+       TripShare v2 – with manual partial settlements
        ============================================================ */
 
     // ---------- constants ----------
-    // Hard‑coded Supabase credentials (not exposed in UI)
     const APP_SUPABASE_URL = "https://cusegeussklgueqpwkbz.supabase.co";
     const APP_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1c2VnZXVzc2tsZ3VlcXB3a2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTc1MDksImV4cCI6MjA5NzQ3MzUwOX0.HOO_Ko5Rk9fKDVXEwGDZye5JupcvIwewH50tN19JRXE";
 
@@ -917,8 +944,10 @@
       tripName: "My Trip",
       people: ["Alex", "Jamie"],
       expenses: [],
+      settlements: [], // manual settlements: { id, from, to, amount, date }
       audit: [],
       nextExpenseId: 1,
+      nextSettlementId: 1,
       shortSlug: null,
     };
 
@@ -966,9 +995,7 @@
         }
       } catch (_) { /* ignore */ }
       const s = clone(defaultState);
-      if (!s.shortSlug) {
-        s.shortSlug = generateUniqueSlugSync();
-      }
+      if (!s.shortSlug) s.shortSlug = generateUniqueSlugSync();
       s.audit.push(auditEvent("Trip created"));
       return s;
     }
@@ -978,8 +1005,10 @@
         tripName: v.tripName || defaultState.tripName,
         people: Array.isArray(v.people) ? v.people : [],
         expenses: Array.isArray(v.expenses) ? v.expenses : [],
+        settlements: Array.isArray(v.settlements) ? v.settlements : [],
         audit: Array.isArray(v.audit) ? v.audit : [],
         nextExpenseId: Number(v.nextExpenseId || 1),
+        nextSettlementId: Number(v.nextSettlementId || 1),
         shortSlug: v.shortSlug || null,
       };
     }
@@ -997,9 +1026,9 @@
         v.people = clone(defaultState.people);
         v.shortSlug = generateUniqueSlugSync();
       }
-      if (!v.shortSlug) {
-        v.shortSlug = generateUniqueSlugSync();
-      }
+      if (!v.shortSlug) v.shortSlug = generateUniqueSlugSync();
+      if (!v.settlements) v.settlements = [];
+      if (!v.nextSettlementId) v.nextSettlementId = 1;
       return v;
     }
 
@@ -1121,14 +1150,31 @@
       $("inviteLink").value = buildInviteLink();
       $("shortInviteLink").value = buildShortInviteLink($("shortSlug").value.trim() || state.shortSlug || "");
       if (!$("expenseDate").value) $("expenseDate").value = today;
+      if (!$("settlementDate").value) $("settlementDate").value = today;
 
       renderParticipants();
       renderExpenseFormPeople();
       renderExpenses();
       renderDashboard();
       renderSettlements();
+      renderManualSettlements();
       renderAudit();
       updateSyncStatusDetail();
+
+      // populate settlement form selects
+      populateSettlementSelects();
+    }
+
+    function populateSettlementSelects() {
+      const opts = state.people.map(n => `<option value="${escapeAttr(n)}">${escapeHtml(n)}</option>`).join("");
+      const fromSel = $("settlementFrom");
+      const toSel = $("settlementTo");
+      const currentFrom = fromSel.value;
+      const currentTo = toSel.value;
+      fromSel.innerHTML = `<option value="">—</option>` + opts;
+      toSel.innerHTML = `<option value="">—</option>` + opts;
+      if (currentFrom && state.people.includes(currentFrom)) fromSel.value = currentFrom;
+      if (currentTo && state.people.includes(currentTo)) toSel.value = currentTo;
     }
 
     function updateSyncStatusDetail() {
@@ -1281,14 +1327,19 @@
       } else {
         wrap.innerHTML = `
           <table class="balance-table">
-            <thead><tr><th>Name</th><th>Paid</th><th>Owes</th><th>Balance</th></tr></thead>
+            <thead><tr><th>Name</th><th>Paid</th><th>Owes</th><th>Settlements</th><th>Balance</th></tr></thead>
             <tbody>${state.people.map(name => {
               const b = balances[name] || { paid: 0, owes: 0, net: 0 };
+              // compute settlement net for display
+              const settledReceived = sum(state.settlements.filter(s => s.to === name).map(s => s.amount));
+              const settledPaid = sum(state.settlements.filter(s => s.from === name).map(s => s.amount));
+              const settlementNet = settledReceived - settledPaid;
               return `
                 <tr>
                   <td>${escapeHtml(name)}</td>
                   <td>${currency.format(b.paid)}</td>
                   <td>${currency.format(b.owes)}</td>
+                  <td>${currency.format(settlementNet)}</td>
                   <td class="${b.net >= 0 ? "positive" : "negative"}">${currency.format(b.net)}</td>
                 </tr>
               `;
@@ -1317,7 +1368,7 @@
         `).join("");
       }
 
-      // ---- Settlement preview on dashboard ----
+      // ---- Settlement preview on dashboard (remaining suggested settlements) ----
       const settlements = calculateSettlements();
       const previewWrap = $("settlementPreview");
       if (!settlements.length) {
@@ -1334,12 +1385,38 @@
       }
     }
 
-    // -- settlements --
+    // -- settlements (manual) --
+    function renderManualSettlements() {
+      const wrap = $("manualSettlementsList");
+      if (!state.settlements.length) {
+        wrap.innerHTML = `<div class="empty-state"><span class="icon">💸</span>No manual settlements recorded.</div>`;
+        return;
+      }
+      // sort by date descending
+      const sorted = [...state.settlements].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+      wrap.innerHTML = sorted.map(s => `
+        <div class="list-item">
+          <div class="main">
+            <strong>${escapeHtml(s.from)} → ${escapeHtml(s.to)}</strong>
+            <div class="meta">${escapeHtml(s.date)}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="amount">${currency.format(s.amount)}</span>
+            <button class="btn-ghost btn-xs delete-settlement" data-id="${s.id}" type="button">✕</button>
+          </div>
+        </div>
+      `).join("");
+      document.querySelectorAll(".delete-settlement").forEach(btn => {
+        btn.addEventListener("click", () => deleteSettlement(Number(btn.dataset.id)));
+      });
+    }
+
+    // -- suggested settlements (remaining) --
     function renderSettlements() {
       const settlements = calculateSettlements();
       const wrap = $("settlements");
       if (!settlements.length) {
-        wrap.innerHTML = `<div class="empty-state"><span class="icon">✅</span>Everyone is settled.</div>`;
+        wrap.innerHTML = `<div class="empty-state"><span class="icon">✅</span>No remaining settlements needed.</div>`;
         return;
       }
       wrap.innerHTML = settlements.map(item => `
@@ -1365,17 +1442,29 @@
       `).join("");
     }
 
-    // ---------- calculations ----------
+    // ---------- calculations with settlements ----------
     function calculateBalances() {
       const b = Object.fromEntries(state.people.map(n => [n, { paid: 0, owes: 0, net: 0 }]));
+      // add expense contributions
       for (const exp of state.expenses) {
         if (b[exp.paidBy]) b[exp.paidBy].paid += exp.amount;
         for (const [name, share] of Object.entries(exp.splitShares || {})) {
           if (b[name]) b[name].owes += exp.amount * share;
         }
       }
-      for (const n of Object.keys(b)) {
-        b[n].net = roundMoney(b[n].paid - b[n].owes);
+      // add manual settlements: if A pays B, A's net increases (debt reduced), B's net decreases (received)
+      for (const s of state.settlements) {
+        if (b[s.from] && b[s.to]) {
+          // from: they paid, so their net increases (less debt)
+          b[s.from].net += s.amount;
+          // to: they received, so their net decreases (less receivable)
+          b[s.to].net -= s.amount;
+        }
+      }
+      // now compute final net = paid - owes + settlement adjustment (already applied)
+      // but we also need to include the paid/owes for display; we'll set net as final
+      for (const name of Object.keys(b)) {
+        b[name].net = roundMoney(b[name].paid - b[name].owes + b[name].net); // net already has settlement adjustment
       }
       return b;
     }
@@ -1539,6 +1628,7 @@
       if (!name) return;
       snapshot();
 
+      // Remove from expenses (redistribute shares)
       const updated = [];
       for (const exp of state.expenses) {
         if (exp.paidBy === name) continue;
@@ -1564,13 +1654,53 @@
         if (Object.keys(next.splitShares).length) updated.push(next);
       }
 
+      // Remove from settlements
+      const settlements = state.settlements.filter(s => s.from !== name && s.to !== name);
+
       state.people = state.people.filter(p => p !== name);
       state.expenses = updated;
+      state.settlements = settlements;
       state.audit.unshift(auditEvent(`Removed participant "${name}"`));
       pendingRemoveName = null;
       $("removeDialog").close();
       saveAndRender();
       toast(`Removed "${name}"`, "success");
+    }
+
+    // ---------- manual settlements CRUD ----------
+    function addSettlement(event) {
+      event.preventDefault();
+      const from = $("settlementFrom").value;
+      const to = $("settlementTo").value;
+      const amount = roundMoney(Number($("settlementAmount").value));
+      const date = $("settlementDate").value || today;
+      if (!from || !to || from === to) {
+        toast("Please select different participants.", "error");
+        return;
+      }
+      if (amount <= 0) {
+        toast("Amount must be greater than zero.", "error");
+        return;
+      }
+      snapshot();
+      const id = state.nextSettlementId++;
+      state.settlements.push({ id, from, to, amount, date });
+      state.audit.unshift(auditEvent(`Recorded payment: ${from} → ${to} ${currency.format(amount)}`));
+      $("settlementForm").reset();
+      $("settlementDate").value = today;
+      saveAndRender();
+      toast(`Payment recorded: ${from} → ${to}`, "success");
+    }
+
+    function deleteSettlement(id) {
+      const s = state.settlements.find(item => item.id === id);
+      if (!s) return;
+      if (!confirm(`Delete settlement ${s.from} → ${s.to} ${currency.format(s.amount)}?`)) return;
+      snapshot();
+      state.settlements = state.settlements.filter(item => item.id !== id);
+      state.audit.unshift(auditEvent(`Deleted settlement: ${s.from} → ${s.to}`));
+      saveAndRender();
+      toast("Settlement deleted", "success");
     }
 
     // ---------- sync (auto-connect, no UI) ----------
@@ -1789,7 +1919,9 @@
       state.audit = [auditEvent("New trip created")];
       state.people = clone(defaultState.people);
       state.expenses = [];
+      state.settlements = [];
       state.nextExpenseId = 1;
+      state.nextSettlementId = 1;
       lastSnapshot = null;
       history.replaceState(null, "", "#join/" + newSlug);
       saveAndRender();
@@ -1877,10 +2009,13 @@
       saveAndRender();
     });
 
-    // forms
+    // expense form
     $("expenseForm").addEventListener("submit", addOrUpdateExpense);
     $("personForm").addEventListener("submit", addPerson);
     $("splitType").addEventListener("change", renderRatioInputs);
+
+    // settlement form
+    $("settlementForm").addEventListener("submit", addSettlement);
 
     // cancel edit
     $("cancelEditExpense").addEventListener("click", resetExpenseForm);
