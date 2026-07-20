@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes" />
   <title>TripShare v2 — shared trip expenses</title>
-
   <style>
     /* ---------- reset & tokens ---------- */
     *,
@@ -37,8 +36,6 @@
       --radius-sm: 6px;
       --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       --transition: 180ms ease;
-
-      /* Tab colors */
       --tab-dashboard: #0f766e;
       --tab-expenses: #2563eb;
       --tab-people: #7c3aed;
@@ -64,7 +61,12 @@
         var(--paper);
     }
 
-    h1, h2, h3, p { margin-top: 0; }
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
     h1 {
       font-size: clamp(24px, 4.2vw, 44px);
       font-weight: 750;
@@ -94,8 +96,13 @@
       color: var(--ink-soft);
       margin-bottom: 8px;
     }
-    a { color: var(--teal); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    a {
+      color: var(--teal);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
 
     /* ---------- buttons & inputs ---------- */
     button {
@@ -118,27 +125,63 @@
       user-select: none;
       touch-action: manipulation;
     }
-    button:hover { filter: brightness(0.96); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-    button:active { transform: translateY(0); }
-    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+    button:hover {
+      filter: brightness(0.96);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
 
     .btn-ghost {
       background: transparent;
       color: var(--ink-soft);
       border-color: var(--line);
     }
-    .btn-ghost:hover { background: var(--paper); border-color: var(--line-strong); color: var(--ink); }
+    .btn-ghost:hover {
+      background: var(--paper);
+      border-color: var(--line-strong);
+      color: var(--ink);
+    }
 
-    .btn-accent { background: var(--teal); color: #fff; }
-    .btn-accent:hover { background: var(--teal-dark); }
+    .btn-accent {
+      background: var(--teal);
+      color: #fff;
+    }
+    .btn-accent:hover {
+      background: var(--teal-dark);
+    }
 
-    .btn-danger { background: var(--coral); color: #fff; }
-    .btn-danger:hover { background: #b5533a; }
+    .btn-danger {
+      background: var(--coral);
+      color: #fff;
+    }
+    .btn-danger:hover {
+      background: #b5533a;
+    }
 
-    .btn-sm { min-height: 36px; padding: 6px 12px; font-size: 12px; }
-    .btn-xs { min-height: 32px; padding: 4px 10px; font-size: 11px; border-radius: 4px; }
+    .btn-sm {
+      min-height: 36px;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+    .btn-xs {
+      min-height: 32px;
+      padding: 4px 10px;
+      font-size: 11px;
+      border-radius: 4px;
+    }
 
-    input, select, textarea {
+    input,
+    select,
+    textarea {
       font: inherit;
       width: 100%;
       border: 1px solid var(--line);
@@ -150,13 +193,21 @@
       transition: border-color var(--transition), box-shadow var(--transition);
       font-size: 16px;
     }
-    input:focus, select:focus, textarea:focus {
+    input:focus,
+    select:focus,
+    textarea:focus {
       outline: 0;
       border-color: var(--teal);
       box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
     }
-    input::placeholder { color: var(--muted); opacity: 0.7; }
-    textarea { min-height: 70px; resize: vertical; }
+    input::placeholder {
+      color: var(--muted);
+      opacity: 0.7;
+    }
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
     label {
       display: grid;
       gap: 4px;
@@ -190,7 +241,9 @@
       border-bottom: 1px solid var(--line);
       margin-bottom: 10px;
     }
-    .topbar-left { flex: 1 1 200px; }
+    .topbar-left {
+      flex: 1 1 200px;
+    }
     .topbar-left p {
       color: var(--muted);
       font-size: 13px;
@@ -220,6 +273,7 @@
       padding: 8px 12px;
       min-height: 44px;
       flex: 1 1 160px;
+      min-width: 120px;
     }
 
     .status-pill {
@@ -244,7 +298,9 @@
       background: var(--amber);
       flex-shrink: 0;
     }
-    .status-pill .dot.live { background: var(--teal); }
+    .status-pill .dot.live {
+      background: var(--teal);
+    }
 
     /* New Trip pill – same as .status-pill but clickable */
     .pill-new-trip {
@@ -263,9 +319,6 @@
       min-height: 32px;
       cursor: pointer;
       transition: background var(--transition), border-color var(--transition);
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid var(--line);
-      color: var(--muted);
       font: inherit;
     }
     .pill-new-trip:hover {
@@ -318,24 +371,48 @@
     .tabs-vertical button.active {
       color: #fff;
     }
-    /* Individual tab colors */
-    .tabs-vertical button[data-tab="dashboard"].active { background: var(--tab-dashboard); }
-    .tabs-vertical button[data-tab="dashboard"]:not(.active):hover { border-color: var(--tab-dashboard); color: var(--tab-dashboard); }
-
-    .tabs-vertical button[data-tab="expenses"].active { background: var(--tab-expenses); }
-    .tabs-vertical button[data-tab="expenses"]:not(.active):hover { border-color: var(--tab-expenses); color: var(--tab-expenses); }
-
-    .tabs-vertical button[data-tab="people"].active { background: var(--tab-people); }
-    .tabs-vertical button[data-tab="people"]:not(.active):hover { border-color: var(--tab-people); color: var(--tab-people); }
-
-    .tabs-vertical button[data-tab="settle"].active { background: var(--tab-settle); }
-    .tabs-vertical button[data-tab="settle"]:not(.active):hover { border-color: var(--tab-settle); color: var(--tab-settle); }
-
-    .tabs-vertical button[data-tab="history"].active { background: var(--tab-history); }
-    .tabs-vertical button[data-tab="history"]:not(.active):hover { border-color: var(--tab-history); color: var(--tab-history); }
-
-    .tabs-vertical button[data-tab="invite"].active { background: var(--tab-invite); }
-    .tabs-vertical button[data-tab="invite"]:not(.active):hover { border-color: var(--tab-invite); color: var(--tab-invite); }
+    .tabs-vertical button[data-tab="dashboard"].active {
+      background: var(--tab-dashboard);
+    }
+    .tabs-vertical button[data-tab="dashboard"]:not(.active):hover {
+      border-color: var(--tab-dashboard);
+      color: var(--tab-dashboard);
+    }
+    .tabs-vertical button[data-tab="expenses"].active {
+      background: var(--tab-expenses);
+    }
+    .tabs-vertical button[data-tab="expenses"]:not(.active):hover {
+      border-color: var(--tab-expenses);
+      color: var(--tab-expenses);
+    }
+    .tabs-vertical button[data-tab="people"].active {
+      background: var(--tab-people);
+    }
+    .tabs-vertical button[data-tab="people"]:not(.active):hover {
+      border-color: var(--tab-people);
+      color: var(--tab-people);
+    }
+    .tabs-vertical button[data-tab="settle"].active {
+      background: var(--tab-settle);
+    }
+    .tabs-vertical button[data-tab="settle"]:not(.active):hover {
+      border-color: var(--tab-settle);
+      color: var(--tab-settle);
+    }
+    .tabs-vertical button[data-tab="history"].active {
+      background: var(--tab-history);
+    }
+    .tabs-vertical button[data-tab="history"]:not(.active):hover {
+      border-color: var(--tab-history);
+      color: var(--tab-history);
+    }
+    .tabs-vertical button[data-tab="invite"].active {
+      background: var(--tab-invite);
+    }
+    .tabs-vertical button[data-tab="invite"]:not(.active):hover {
+      border-color: var(--tab-invite);
+      color: var(--tab-invite);
+    }
 
     .tabs-vertical .tab-icon {
       margin-right: 8px;
@@ -347,15 +424,26 @@
       min-width: 0;
     }
 
-    .section { display: none; animation: fadeUp 220ms ease; }
-    .section.active { display: block; }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+    .section {
+      display: none;
+      animation: fadeUp 220ms ease;
+    }
+    .section.active {
+      display: block;
     }
 
-    /* ---------- responsive: vertical tabs become horizontal on small screens ---------- */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ---------- responsive: vertical tabs become horizontal ---------- */
     @media (max-width: 820px) {
       .app-layout {
         flex-direction: column;
@@ -371,24 +459,85 @@
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
       }
-      .tabs-vertical::-webkit-scrollbar { display: none; }
+      .tabs-vertical::-webkit-scrollbar {
+        display: none;
+      }
       .tabs-vertical button {
-        padding: 6px 10px;
+        padding: 6px 8px;
         min-height: 34px;
         font-size: 12px;
         white-space: nowrap;
         flex-shrink: 0;
         width: auto;
+        justify-content: center;
+        gap: 2px;
+        background: transparent;
+        border-radius: 999px;
+        border: 1px solid transparent;
       }
-      .tabs-vertical .tab-icon { margin-right: 4px; }
-      /* Show labels for all tabs on mobile */
-      .tabs-vertical button .tab-label { display: inline; }
-      /* Slightly reduce font on very small screens if needed */
+      .tabs-vertical button .tab-label {
+        display: none;
+        /* hidden by default on mobile */
+      }
+      /* active tab shows label */
+      .tabs-vertical button.active .tab-label {
+        display: inline;
+      }
+      .tabs-vertical button .tab-icon {
+        margin-right: 0;
+        font-size: 18px;
+      }
+      .tabs-vertical button.active .tab-icon {
+        margin-right: 4px;
+        font-size: 16px;
+      }
+      .tabs-vertical button.active {
+        background: var(--ink);
+        color: #fff;
+        border-color: var(--ink);
+        padding: 6px 12px;
+      }
+      .tabs-vertical button.active[data-tab="dashboard"] {
+        background: var(--tab-dashboard);
+        border-color: var(--tab-dashboard);
+      }
+      .tabs-vertical button.active[data-tab="expenses"] {
+        background: var(--tab-expenses);
+        border-color: var(--tab-expenses);
+      }
+      .tabs-vertical button.active[data-tab="people"] {
+        background: var(--tab-people);
+        border-color: var(--tab-people);
+      }
+      .tabs-vertical button.active[data-tab="settle"] {
+        background: var(--tab-settle);
+        border-color: var(--tab-settle);
+      }
+      .tabs-vertical button.active[data-tab="history"] {
+        background: var(--tab-history);
+        border-color: var(--tab-history);
+      }
+      .tabs-vertical button.active[data-tab="invite"] {
+        background: var(--tab-invite);
+        border-color: var(--tab-invite);
+      }
     }
 
     @media (max-width: 480px) {
-      .tabs-vertical button { padding: 4px 8px; font-size: 11px; min-height: 30px; }
-      .tabs-vertical .tab-icon { font-size: 14px; }
+      .tabs-vertical button {
+        padding: 4px 6px;
+        min-height: 30px;
+        font-size: 11px;
+      }
+      .tabs-vertical button .tab-icon {
+        font-size: 16px;
+      }
+      .tabs-vertical button.active .tab-icon {
+        font-size: 14px;
+      }
+      .tabs-vertical button.active {
+        padding: 4px 10px;
+      }
     }
 
     /* ---------- grid & panels ---------- */
@@ -412,8 +561,12 @@
       padding: 16px;
       transition: box-shadow var(--transition);
     }
-    .panel:hover { box-shadow: var(--shadow); }
-    .panel.flat { box-shadow: none; }
+    .panel:hover {
+      box-shadow: var(--shadow);
+    }
+    .panel.flat {
+      box-shadow: none;
+    }
     .panel-header {
       display: flex;
       align-items: center;
@@ -422,14 +575,18 @@
       gap: 8px;
       margin-bottom: 12px;
     }
-    .panel-header h2 { margin-bottom: 0; }
+    .panel-header h2 {
+      margin-bottom: 0;
+    }
 
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px 16px;
     }
-    .form-grid .wide { grid-column: 1 / -1; }
+    .form-grid .wide {
+      grid-column: 1 / -1;
+    }
 
     .chips {
       display: flex;
@@ -450,7 +607,9 @@
       transition: border-color var(--transition), background var(--transition);
       cursor: default;
     }
-    .chip:hover { border-color: var(--line-strong); }
+    .chip:hover {
+      border-color: var(--line-strong);
+    }
     .chip input[type="checkbox"] {
       width: 18px;
       height: 18px;
@@ -468,7 +627,9 @@
       text-align: center;
       border-color: var(--line);
     }
-    .chip input[type="number"]:focus { border-color: var(--teal); }
+    .chip input[type="number"]:focus {
+      border-color: var(--teal);
+    }
 
     .ratio-grid {
       display: grid;
@@ -546,7 +707,9 @@
       justify-content: flex-end;
       margin-top: 14px;
     }
-    .toolbar-start { justify-content: flex-start; }
+    .toolbar-start {
+      justify-content: flex-start;
+    }
 
     .row {
       display: flex;
@@ -564,9 +727,17 @@
       background: rgba(255, 255, 255, 0.5);
       font-size: 14px;
     }
-    .empty-state .icon { font-size: 28px; display: block; margin-bottom: 6px; }
+    .empty-state .icon {
+      font-size: 28px;
+      display: block;
+      margin-bottom: 6px;
+    }
 
-    .list { display: grid; gap: 10px; margin-top: 10px; }
+    .list {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
 
     .list-item {
       border: 1px solid var(--line);
@@ -579,16 +750,28 @@
       align-items: center;
       transition: border-color var(--transition), box-shadow var(--transition);
     }
-    .list-item:hover { border-color: var(--line-strong); box-shadow: var(--shadow-sm); }
-    .list-item .main { min-width: 0; }
-    .list-item .main strong { display: block; font-weight: 650; overflow-wrap: anywhere; }
+    .list-item:hover {
+      border-color: var(--line-strong);
+      box-shadow: var(--shadow-sm);
+    }
+    .list-item .main {
+      min-width: 0;
+    }
+    .list-item .main strong {
+      display: block;
+      font-weight: 650;
+      overflow-wrap: anywhere;
+    }
     .list-item .meta {
       color: var(--muted);
       font-size: 12px;
       margin-top: 2px;
       line-height: 1.5;
     }
-    .list-item .meta .sep { margin: 0 4px; opacity: 0.5; }
+    .list-item .meta .sep {
+      margin: 0 4px;
+      opacity: 0.5;
+    }
     .list-item .amount {
       font-weight: 750;
       font-size: 17px;
@@ -630,12 +813,17 @@
       border-collapse: collapse;
       font-size: 13px;
     }
-    .balance-table th, .balance-table td {
+    .balance-table th,
+    .balance-table td {
       border-bottom: 1px solid var(--line);
       padding: 8px 6px;
       text-align: right;
     }
-    .balance-table th:first-child, .balance-table td:first-child { text-align: left; font-weight: 550; }
+    .balance-table th:first-child,
+    .balance-table td:first-child {
+      text-align: left;
+      font-weight: 550;
+    }
     .balance-table th {
       font-weight: 600;
       color: var(--muted);
@@ -643,8 +831,14 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
-    .balance-table .positive { color: var(--teal-dark); font-weight: 700; }
-    .balance-table .negative { color: var(--coral); font-weight: 700; }
+    .balance-table .positive {
+      color: var(--teal-dark);
+      font-weight: 700;
+    }
+    .balance-table .negative {
+      color: var(--coral);
+      font-weight: 700;
+    }
 
     .cat-bar-row {
       display: grid;
@@ -667,8 +861,15 @@
       border-radius: inherit;
       transition: width 400ms ease;
     }
-    .cat-bar-row .cat-label { font-weight: 500; color: var(--ink-soft); }
-    .cat-bar-row .cat-amount { font-weight: 650; text-align: right; font-size: 13px; }
+    .cat-bar-row .cat-label {
+      font-weight: 500;
+      color: var(--ink-soft);
+    }
+    .cat-bar-row .cat-amount {
+      font-weight: 650;
+      text-align: right;
+      font-size: 13px;
+    }
 
     .settlement-item {
       border: 1px solid var(--line);
@@ -681,8 +882,13 @@
       justify-content: space-between;
       gap: 6px 12px;
     }
-    .settlement-item strong { font-weight: 600; }
-    .settlement-item .arrow { color: var(--muted); margin: 0 4px; }
+    .settlement-item strong {
+      font-weight: 600;
+    }
+    .settlement-item .arrow {
+      color: var(--muted);
+      margin: 0 4px;
+    }
 
     .audit-item {
       border-bottom: 1px solid var(--line);
@@ -693,8 +899,14 @@
       gap: 4px 12px;
       font-size: 13px;
     }
-    .audit-item:last-child { border-bottom: 0; }
-    .audit-item .time { color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .audit-item:last-child {
+      border-bottom: 0;
+    }
+    .audit-item .time {
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
 
     .notice {
       border: 1px solid var(--amber-light);
@@ -730,7 +942,9 @@
       border-radius: var(--radius);
       padding: 22px 24px 24px;
     }
-    dialog.modal .modal-body h2 { margin-bottom: 8px; }
+    dialog.modal .modal-body h2 {
+      margin-bottom: 8px;
+    }
 
     .toast-container {
       position: fixed;
@@ -757,8 +971,12 @@
       align-items: flex-start;
       gap: 10px;
     }
-    .toast.success { background: var(--teal-dark); }
-    .toast.error { background: var(--coral); }
+    .toast.success {
+      background: var(--teal-dark);
+    }
+    .toast.error {
+      background: var(--coral);
+    }
     .toast .toast-close {
       background: transparent;
       border: 0;
@@ -770,71 +988,188 @@
       cursor: pointer;
       flex-shrink: 0;
     }
-    .toast .toast-close:hover { color: #fff; transform: none; box-shadow: none; filter: none; }
+    .toast .toast-close:hover {
+      color: #fff;
+      transform: none;
+      box-shadow: none;
+      filter: none;
+    }
     @keyframes toastIn {
-      from { opacity: 0; transform: translateY(12px) scale(0.96); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
-    .hidden { display: none !important; }
+    .hidden {
+      display: none !important;
+    }
 
     /* ---------- mobile overrides ---------- */
     @media (max-width: 820px) {
-      .app { padding: 12px 12px 24px; }
-      .grid-2 { grid-template-columns: 1fr; }
-      .form-grid { grid-template-columns: 1fr; }
-      .form-grid .wide { grid-column: 1; }
-      .topbar { flex-direction: column; align-items: stretch; gap: 4px; }
-      .topbar-right { justify-content: flex-start; }
-      .trip-name-row input { max-width: 100%; flex: 1; }
-      .list-item { grid-template-columns: 1fr; }
-      .list-item .amount { text-align: left; font-size: 16px; }
-      .cat-bar-row { grid-template-columns: 80px minmax(0, 1fr); gap: 6px; }
-      .cat-bar-row .cat-amount { grid-column: 2; text-align: left; }
-      .stat-card strong { font-size: 20px; }
-      .ratio-grid { grid-template-columns: 1fr 1fr; }
-      .exact-grid { grid-template-columns: 1fr 1fr; }
-      .toast-container { bottom: 12px; right: 12px; max-width: calc(100% - 24px); }
+      .app {
+        padding: 12px 12px 24px;
+      }
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-grid .wide {
+        grid-column: 1;
+      }
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+      }
+      .topbar-right {
+        justify-content: flex-start;
+      }
+      .trip-name-row input {
+        max-width: 100%;
+        flex: 1 1 100%;
+        min-width: 80px;
+      }
+      .list-item {
+        grid-template-columns: 1fr;
+      }
+      .list-item .amount {
+        text-align: left;
+        font-size: 16px;
+      }
+      .cat-bar-row {
+        grid-template-columns: 80px minmax(0, 1fr);
+        gap: 6px;
+      }
+      .cat-bar-row .cat-amount {
+        grid-column: 2;
+        text-align: left;
+      }
+      .stat-card strong {
+        font-size: 20px;
+      }
+      .ratio-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .exact-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .toast-container {
+        bottom: 12px;
+        right: 12px;
+        max-width: calc(100% - 24px);
+      }
     }
 
     @media (max-width: 600px) {
-      .app { padding: 10px 10px 20px; }
-      .topbar-left h1 { font-size: 24px; }
-      .topbar-left p { font-size: 13px; }
-      .panel { padding: 12px; }
-      .ratio-grid { grid-template-columns: 1fr; }
-      .exact-grid { grid-template-columns: 1fr; }
-      .grid-3 { grid-template-columns: 1fr 1fr; }
-      .stat-card { padding: 10px; }
-      .stat-card strong { font-size: 18px; }
-      .list-item { padding: 10px 12px; }
-      .list-item .amount { font-size: 15px; }
-      .toolbar button { flex: 1 1 auto; min-width: 80px; }
-      .chip { font-size: 13px; padding: 4px 10px 4px 6px; min-height: 32px; }
-      .chip input[type="checkbox"] { width: 16px; height: 16px; }
-      .chip input[type="number"] { width: 48px; font-size: 13px; }
-      input, select, textarea { font-size: 16px; padding: 8px 10px; min-height: 40px; }
-      button { font-size: 13px; padding: 8px 12px; min-height: 40px; }
-      .btn-sm { min-height: 32px; padding: 4px 10px; font-size: 11px; }
-      .btn-xs { min-height: 28px; padding: 2px 8px; font-size: 10px; }
-      .trip-name-row .status-pill:first-of-type { max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+      .app {
+        padding: 10px 10px 20px;
+      }
+      .topbar-left h1 {
+        font-size: 24px;
+      }
+      .topbar-left p {
+        font-size: 13px;
+      }
+      .panel {
+        padding: 12px;
+      }
+      .ratio-grid {
+        grid-template-columns: 1fr;
+      }
+      .exact-grid {
+        grid-template-columns: 1fr;
+      }
+      .grid-3 {
+        grid-template-columns: 1fr 1fr;
+      }
+      .stat-card {
+        padding: 10px;
+      }
+      .stat-card strong {
+        font-size: 18px;
+      }
+      .list-item {
+        padding: 10px 12px;
+      }
+      .list-item .amount {
+        font-size: 15px;
+      }
+      .toolbar button {
+        flex: 1 1 auto;
+        min-width: 80px;
+      }
+      .chip {
+        font-size: 13px;
+        padding: 4px 10px 4px 6px;
+        min-height: 32px;
+      }
+      .chip input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+      }
+      .chip input[type="number"] {
+        width: 48px;
+        font-size: 13px;
+      }
+      input,
+      select,
+      textarea {
+        font-size: 16px;
+        padding: 8px 10px;
+        min-height: 40px;
+      }
+      button {
+        font-size: 13px;
+        padding: 8px 12px;
+        min-height: 40px;
+      }
+      .btn-sm {
+        min-height: 32px;
+        padding: 4px 10px;
+        font-size: 11px;
+      }
+      .btn-xs {
+        min-height: 28px;
+        padding: 2px 8px;
+        font-size: 10px;
+      }
+      .trip-name-row .status-pill:first-of-type {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     @media (max-width: 420px) {
-      .grid-3 { grid-template-columns: 1fr; }
-      .topbar-left h1 { font-size: 20px; }
-      .panel { padding: 10px; }
-      .stat-card { padding: 8px; }
-      .stat-card strong { font-size: 16px; }
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+      .topbar-left h1 {
+        font-size: 20px;
+      }
+      .panel {
+        padding: 10px;
+      }
+      .stat-card {
+        padding: 8px;
+      }
+      .stat-card strong {
+        font-size: 16px;
+      }
     }
   </style>
 </head>
 
 <body>
-
   <!-- ===== APP ===== -->
   <main class="app">
-
     <!-- HEADER -->
     <header class="topbar">
       <div class="topbar-left">
@@ -860,7 +1195,6 @@
 
     <!-- VERTICAL TABS + CONTENT -->
     <div class="app-layout">
-
       <!-- TABS -->
       <nav class="tabs-vertical" aria-label="Sections">
         <button class="tab active" data-tab="dashboard" type="button">
@@ -885,7 +1219,6 @@
 
       <!-- CONTENT AREA -->
       <div class="content-area">
-
         <!-- ===== DASHBOARD ===== -->
         <section id="dashboard" class="section active">
           <div class="grid-3" style="margin-bottom:16px;">
@@ -1050,9 +1383,7 @@
                 <button id="newTrip" class="btn-ghost btn-sm" type="button">🔄 New trip</button>
                 <button id="copyInvite2" class="btn-accent btn-sm" type="button">📋 Copy</button>
               </div>
-
               <hr style="border:0;border-top:1px solid var(--line);margin:16px 0;" />
-
               <label>Short slug (5‑6 letters)
                 <div class="row">
                   <input id="shortSlug" maxlength="32" placeholder="dexter" style="flex:1;" />
@@ -1066,12 +1397,10 @@
                 <button id="saveShortInvite" class="btn-accent" type="button">💾 Save short link</button>
                 <button id="copyShortInvite" class="btn-ghost" type="button">📋 Copy</button>
               </div>
-
               <div class="notice notice-info" style="margin-top:16px;">
                 The short slug is stored in the cloud and makes your invite link memorable.
               </div>
             </div>
-
             <div class="panel">
               <h2>Sync status</h2>
               <p id="syncStatusDetail" style="color:var(--muted);">Local – changes are saved locally.</p>
@@ -1079,10 +1408,8 @@
             </div>
           </div>
         </section>
-
-      </div><!-- /content-area -->
-    </div><!-- /app-layout -->
-
+      </div>
+    </div>
   </main>
 
   <!-- ===== MODAL ===== -->
@@ -1103,13 +1430,11 @@
   <!-- ===== SCRIPT ===== -->
   <script type="module">
     /* ============================================================
-       TripShare v2 – final with consistent pill style & mobile tab fix
+       TripShare v2 – final (mobile tabs fixed, pill style unified)
        ============================================================ */
-
-    // ---------- constants ----------
     const APP_SUPABASE_URL = "https://cusegeussklgueqpwkbz.supabase.co";
-    const APP_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1c2VnZXVzc2tsZ3VlcXB3a2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTc1MDksImV4cCI6MjA5NzQ3MzUwOX0.HOO_Ko5Rk9fKDVXEwGDZye5JupcvIwewH50tN19JRXE";
-
+    const APP_SUPABASE_ANON_KEY =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1c2VnZXVzc2tsZ3VlcXB3a2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTc1MDksImV4cCI6MjA5NzQ3MzUwOX0.HOO_Ko5Rk9fKDVXEwGDZye5JupcvIwewH50tN19JRXE";
     const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
     const today = new Date().toISOString().slice(0, 10);
     const categories = ["Food", "Drinks", "Hotel", "Fuel", "Activities", "Shopping", "Transport", "Other"];
@@ -1118,7 +1443,6 @@
       "pebble", "violet", "orbit", "maple", "pixel", "cobalt", "breeze", "lotus",
       "tango", "ember", "olive", "harbor", "meadow", "nova", "saffron", "rocket"
     ];
-
     const defaultState = {
       tripName: "My Trip",
       people: ["Alex", "Jamie"],
@@ -1130,7 +1454,6 @@
       shortSlug: null,
     };
 
-    // ---------- state ----------
     let joinSlug = getJoinSlug();
     let tripId = getTripId();
     let state = loadState();
@@ -1142,11 +1465,9 @@
     let saveTimer = null;
     let isEditingExpense = false;
 
-    // ---------- DOM refs ----------
     const $ = (id) => document.getElementById(id);
     const toastContainer = $("toastContainer");
 
-    // ---------- helpers ----------
     function getJoinSlug() {
       const m = location.hash.match(/^#\/?join\/([a-z0-9-]+)$/i);
       return m ? m[1].toLowerCase() : "";
@@ -1172,7 +1493,7 @@
           const parsed = normalizeState(JSON.parse(raw));
           return migrateDefaultLabels(parsed);
         }
-      } catch (_) { /* ignore */ }
+      } catch (_) {}
       const s = clone(defaultState);
       if (!s.shortSlug) s.shortSlug = generateUniqueSlugSync();
       s.audit.push(auditEvent("Trip created"));
@@ -1219,8 +1540,7 @@
 
     function escapeHtml(s) {
       return String(s ?? "").replace(/[&<>"']/g, (ch) =>
-        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[ch])
-      );
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[ch]));
     }
 
     function escapeAttr(s) { return escapeHtml(s).replace(/`/g, "&#096;"); }
@@ -1237,18 +1557,13 @@
     function toast(message, type = "info") {
       const div = document.createElement("div");
       div.className = `toast ${type}`;
-      div.innerHTML = `
-        <span>${escapeHtml(message)}</span>
-        <button class="toast-close" type="button" aria-label="Dismiss">&times;</button>
-      `;
-      div.querySelector(".toast-close").addEventListener("click", () => {
-        div.remove();
-      });
+      div.innerHTML =
+        `<span>${escapeHtml(message)}</span><button class="toast-close" type="button" aria-label="Dismiss">&times;</button>`;
+      div.querySelector(".toast-close").addEventListener("click", () => { div.remove(); });
       toastContainer.appendChild(div);
       setTimeout(() => { if (div.parentNode) div.remove(); }, 5000);
     }
 
-    // ---------- slug generation & uniqueness ----------
     function generateRandomSlug() {
       return easyWords[Math.floor(Math.random() * easyWords.length)];
     }
@@ -1269,9 +1584,9 @@
     }
 
     async function suggestAlternativeSlug(desired) {
-      let base = desired;
-      let counter = 1;
-      let slug = base;
+      let base = desired,
+        counter = 1,
+        slug = base;
       while (true) {
         const available = await checkSlugUniqueness(slug);
         if (available) return slug;
@@ -1280,7 +1595,6 @@
       }
     }
 
-    // ---------- snapshot / undo ----------
     function snapshot() {
       lastSnapshot = JSON.stringify(state);
       $("undoBtn").disabled = false;
@@ -1296,7 +1610,6 @@
       toast("Undo successful", "success");
     }
 
-    // ---------- save & render ----------
     function saveAndRender() {
       localStorage.setItem(storageKey(), JSON.stringify(state));
       render();
@@ -1321,7 +1634,6 @@
       if (error) setSyncStatus("Local", false, error.message);
     }
 
-    // ---------- render ----------
     function render() {
       $("tripIdLabel").textContent = tripId;
       $("tripName").value = state.tripName;
@@ -1339,7 +1651,6 @@
       renderManualSettlements();
       renderAudit();
       updateSyncStatusDetail();
-
       populateSettlementSelects();
     }
 
@@ -1347,8 +1658,8 @@
       const opts = state.people.map(n => `<option value="${escapeAttr(n)}">${escapeHtml(n)}</option>`).join("");
       const fromSel = $("settlementFrom");
       const toSel = $("settlementTo");
-      const currentFrom = fromSel.value;
-      const currentTo = toSel.value;
+      const currentFrom = fromSel.value,
+        currentTo = toSel.value;
       fromSel.innerHTML = `<option value="">—</option>` + opts;
       toSel.innerHTML = `<option value="">—</option>` + opts;
       if (currentFrom && state.people.includes(currentFrom)) fromSel.value = currentFrom;
@@ -1358,9 +1669,9 @@
     function updateSyncStatusDetail() {
       const label = $("syncLabel").textContent;
       const isLive = $("syncDot").classList.contains("live");
-      $("syncStatusDetail").textContent = isLive
-        ? "Connected to cloud – changes sync automatically."
-        : "Local – changes are saved locally.";
+      $("syncStatusDetail").textContent = isLive ?
+        "Connected to cloud – changes sync automatically." :
+        "Local – changes are saved locally.";
     }
 
     // -- people --
@@ -1395,7 +1706,6 @@
     function renderExpenseFormPeople() {
       const paidBy = $("paidBy");
       paidBy.innerHTML = state.people.map(n => `<option>${escapeHtml(n)}</option>`).join("");
-
       const chips = $("shareChips");
       const checkedSet = new Set();
       if (isEditingExpense) {
@@ -1417,13 +1727,11 @@
           renderExactInputs();
         });
       });
-
       const splitType = $("splitType");
       splitType.addEventListener("change", () => {
         renderRatioInputs();
         renderExactInputs();
       });
-
       renderRatioInputs();
       renderExactInputs();
     }
@@ -1448,20 +1756,16 @@
       wrap.classList.toggle("hidden", !isExact);
       totalWrap.classList.toggle("hidden", !isExact);
       if (!isExact) return;
-
       const selected = selectedParticipants();
       const totalAmount = Number($("expenseAmount").value) || 0;
-
       wrap.innerHTML = selected.map(name => `
         <label>${escapeHtml(name)}
           <input type="number" min="0" step="0.01" value="0" data-exact-for="${escapeAttr(name)}" class="exact-input" />
         </label>
       `).join("");
-
       wrap.querySelectorAll(".exact-input").forEach(input => {
         input.addEventListener("input", updateExactTotal);
       });
-
       if (isEditingExpense) {
         const editId = Number($("editingExpenseId").value || 0);
         const exp = state.expenses.find(e => e.id === editId);
@@ -1472,24 +1776,19 @@
           }
         }
       }
-
       updateExactTotal();
     }
 
     function updateExactTotal() {
       const inputs = document.querySelectorAll(".exact-input");
       let total = 0;
-      inputs.forEach(inp => {
-        total += Number(inp.value) || 0;
-      });
+      inputs.forEach(inp => { total += Number(inp.value) || 0; });
       const expenseTotal = Number($("expenseAmount").value) || 0;
       const remaining = roundMoney(expenseTotal - total);
       const totalWrap = $("exactTotal");
       if (expenseTotal > 0) {
-        totalWrap.innerHTML = `
-          Allocated: ${currency.format(total)} &nbsp;|&nbsp;
-          Remaining: <span class="remaining ${Math.abs(remaining) < 0.005 ? 'zero' : ''}">${currency.format(remaining)}</span>
-        `;
+        totalWrap.innerHTML =
+          `Allocated: ${currency.format(total)} &nbsp;|&nbsp; Remaining: <span class="remaining ${Math.abs(remaining) < 0.005 ? 'zero' : ''}">${currency.format(remaining)}</span>`;
       } else {
         totalWrap.textContent = "Enter an amount first";
       }
@@ -1502,18 +1801,11 @@
     function splitShares() {
       const selected = selectedParticipants();
       if (!selected.length) throw new Error("Choose at least one participant.");
-
       const splitType = $("splitType").value;
-
       if (splitType === "equal") {
         const share = 1 / selected.length;
-        return {
-          splitShares: Object.fromEntries(selected.map(n => [n, share])),
-          ratioWeights: null,
-          exactAmounts: null,
-        };
+        return { splitShares: Object.fromEntries(selected.map(n => [n, share])), ratioWeights: null, exactAmounts: null };
       }
-
       if (splitType === "ratio") {
         const weights = {};
         for (const name of selected) {
@@ -1529,7 +1821,6 @@
           exactAmounts: null,
         };
       }
-
       if (splitType === "exact") {
         const amounts = {};
         let totalAmount = 0;
@@ -1542,7 +1833,8 @@
         }
         const expenseTotal = Number($("expenseAmount").value) || 0;
         if (Math.abs(totalAmount - expenseTotal) > 0.005) {
-          throw new Error(`Total allocated (${currency.format(totalAmount)}) does not equal expense amount (${currency.format(expenseTotal)}).`);
+          throw new Error(
+            `Total allocated (${currency.format(totalAmount)}) does not equal expense amount (${currency.format(expenseTotal)}).`);
         }
         const total = sum(Object.values(amounts));
         return {
@@ -1551,7 +1843,6 @@
           exactAmounts: amounts,
         };
       }
-
       throw new Error("Unknown split type");
     }
 
@@ -1570,7 +1861,8 @@
         const participants = Object.keys(exp.splitShares || {});
         let splitDetail = `${exp.splitType} split`;
         if (exp.splitType === 'exact' && exp.exactAmounts) {
-          const details = Object.entries(exp.exactAmounts).map(([name, amt]) => `${name}: ${currency.format(amt)}`).join(', ');
+          const details = Object.entries(exp.exactAmounts).map(([name, amt]) => `${name}: ${currency.format(amt)}`).join(
+          ', ');
           splitDetail = `Exact: ${details}`;
         } else {
           splitDetail = `${exp.splitType} split with ${participants.map(escapeHtml).join(", ")}`;
@@ -1602,7 +1894,6 @@
     function renderDashboard() {
       const total = sum(state.expenses.map(e => e.amount));
       $("totalSpend").textContent = currency.format(total);
-
       const balances = calculateBalances();
       const wrap = $("balanceWrap");
       if (!state.people.length) {
@@ -1632,7 +1923,6 @@
           </table>
         `;
       }
-
       // category bars
       const totals = Object.fromEntries(categories.map(c => [c, 0]));
       for (const exp of state.expenses) {
@@ -1652,7 +1942,6 @@
           </div>
         `).join("");
       }
-
       // ---- Settlement preview on dashboard ----
       const settlements = calculateSettlements();
       const previewWrap = $("settlementPreview");
@@ -1670,7 +1959,7 @@
       }
     }
 
-    // -- settlements (manual) --
+    // -- settlements --
     function renderManualSettlements() {
       const wrap = $("manualSettlementsList");
       if (!state.settlements.length) {
@@ -1695,7 +1984,6 @@
       });
     }
 
-    // -- suggested settlements (remaining) --
     function renderSettlements() {
       const settlements = calculateSettlements();
       const wrap = $("settlements");
@@ -1726,7 +2014,7 @@
       `).join("");
     }
 
-    // ---------- calculations with settlements ----------
+    // ---------- calculations ----------
     function calculateBalances() {
       const b = Object.fromEntries(state.people.map(n => [n, { paid: 0, owes: 0, net: 0 }]));
       for (const exp of state.expenses) {
@@ -1749,8 +2037,8 @@
 
     function calculateSettlements() {
       const balances = calculateBalances();
-      const debtors = [];
-      const creditors = [];
+      const debtors = [],
+        creditors = [];
       for (const [name, data] of Object.entries(balances)) {
         if (data.net < -0.005) debtors.push({ name, amount: -data.net });
         if (data.net > 0.005) creditors.push({ name, amount: data.net });
@@ -1771,16 +2059,12 @@
       return settlements;
     }
 
-    // ---------- expense CRUD ----------
+    // ---------- CRUD ----------
     function addOrUpdateExpense(event) {
       event.preventDefault();
-      if (!state.people.length) {
-        toast("Add at least one participant first.", "error");
-        return;
-      }
+      if (!state.people.length) { toast("Add at least one participant first.", "error"); return; }
       let split;
       try { split = splitShares(); } catch (err) { toast(err.message, "error"); return; }
-
       const id = Number($("editingExpenseId").value || 0);
       const expense = {
         id: id || state.nextExpenseId++,
@@ -1794,11 +2078,7 @@
         ratioWeights: split.ratioWeights,
         exactAmounts: split.exactAmounts,
       };
-      if (!expense.description || expense.amount <= 0) {
-        toast("Please fill in description and amount.", "error");
-        return;
-      }
-
+      if (!expense.description || expense.amount <= 0) { toast("Please fill in description and amount.", "error"); return; }
       snapshot();
       const idx = state.expenses.findIndex(e => e.id === id);
       if (idx >= 0) {
@@ -1828,7 +2108,6 @@
       $("paidBy").value = exp.paidBy;
       $("category").value = exp.category;
       $("splitType").value = exp.splitType;
-
       renderExpenseFormPeople();
       document.querySelectorAll('input[name="sharedBy"]').forEach(input => {
         input.checked = Object.hasOwn(exp.splitShares || {}, input.value);
@@ -1873,7 +2152,6 @@
       renderExpenseFormPeople();
     }
 
-    // ---------- people CRUD ----------
     function addPerson(event) {
       event.preventDefault();
       const name = $("personName").value.trim();
@@ -1892,10 +2170,7 @@
 
     function openRemoveDialog(name) {
       const remaining = state.people.filter(p => p !== name);
-      if (!remaining.length) {
-        toast("Cannot remove the last participant.", "error");
-        return;
-      }
+      if (!remaining.length) { toast("Cannot remove the last participant.", "error"); return; }
       pendingRemoveName = name;
       const paid = state.expenses.filter(e => e.paidBy === name);
       const shared = state.expenses.filter(e => e.splitShares && Object.hasOwn(e.splitShares, name));
@@ -1914,14 +2189,10 @@
       const name = pendingRemoveName;
       if (!name) return;
       snapshot();
-
       const updated = [];
       for (const exp of state.expenses) {
         if (exp.paidBy === name) continue;
-        if (!exp.splitShares || !Object.hasOwn(exp.splitShares, name)) {
-          updated.push(exp);
-          continue;
-        }
+        if (!exp.splitShares || !Object.hasOwn(exp.splitShares, name)) { updated.push(exp); continue; }
         const next = clone(exp);
         if (next.splitType === "ratio" && next.ratioWeights) {
           delete next.ratioWeights[name];
@@ -1946,9 +2217,7 @@
         }
         if (Object.keys(next.splitShares).length) updated.push(next);
       }
-
       const settlements = state.settlements.filter(s => s.from !== name && s.to !== name);
-
       state.people = state.people.filter(p => p !== name);
       state.expenses = updated;
       state.settlements = settlements;
@@ -1959,21 +2228,14 @@
       toast(`Removed "${name}"`, "success");
     }
 
-    // ---------- manual settlements CRUD ----------
     function addSettlement(event) {
       event.preventDefault();
       const from = $("settlementFrom").value;
       const to = $("settlementTo").value;
       const amount = roundMoney(Number($("settlementAmount").value));
       const date = $("settlementDate").value || today;
-      if (!from || !to || from === to) {
-        toast("Please select different participants.", "error");
-        return;
-      }
-      if (amount <= 0) {
-        toast("Amount must be greater than zero.", "error");
-        return;
-      }
+      if (!from || !to || from === to) { toast("Please select different participants.", "error"); return; }
+      if (amount <= 0) { toast("Amount must be greater than zero.", "error"); return; }
       snapshot();
       const id = state.nextSettlementId++;
       state.settlements.push({ id, from, to, amount, date });
@@ -1995,34 +2257,24 @@
       toast("Settlement deleted", "success");
     }
 
-    // ---------- sync (auto-connect, with fix) ----------
+    // ---------- sync ----------
     async function autoConnectSupabase() {
       const url = APP_SUPABASE_URL;
       const key = APP_SUPABASE_ANON_KEY;
-      if (!url || !key) {
-        setSyncStatus("Local", false, "No credentials");
-        return;
-      }
+      if (!url || !key) { setSyncStatus("Local", false, "No credentials"); return; }
       try {
         const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm");
         supabase = createClient(url, key);
         setSyncStatus("Connecting…", false);
-
         if (joinSlug) {
-          try {
-            await resolveShortInvite(joinSlug);
-          } catch (e) {
-            toast(e.message, "error");
-          }
+          try { await resolveShortInvite(joinSlug); } catch (e) { toast(e.message, "error"); }
         }
-
         const { data, error } = await supabase
           .from("trip_documents")
           .select("payload")
           .eq("id", tripId)
           .maybeSingle();
         if (error) throw error;
-
         if (data?.payload) {
           applyingRemote = true;
           const remoteState = normalizeState(data.payload);
@@ -2043,16 +2295,12 @@
           }
           await saveToCloud();
         }
-
         await saveShortSlugToDB(state.shortSlug);
-
         await subscribeToTrip();
         setSyncStatus("Live sync", true);
-
         if (state.shortSlug && !location.hash.includes("join")) {
           history.replaceState(null, "", "#join/" + state.shortSlug);
         }
-
         render();
         toast("Connected to cloud", "success");
       } catch (err) {
@@ -2164,14 +2412,10 @@
     }
 
     async function saveShortInvite() {
-      if (!supabase) {
-        toast("Cloud not connected. Please wait for auto-connect.", "error");
-        return;
-      }
+      if (!supabase) { toast("Cloud not connected. Please wait for auto-connect.", "error"); return; }
       let slug = normalizeSlug($("shortSlug").value);
       if (!slug) slug = randomEasySlug();
       $("shortSlug").value = slug;
-
       const available = await checkSlugUniqueness(slug);
       let finalSlug = slug;
       if (!available) {
@@ -2187,7 +2431,6 @@
           }
         }
       }
-
       try {
         await saveShortSlugToDB(finalSlug);
         state.shortSlug = finalSlug;
@@ -2219,9 +2462,7 @@
       lastSnapshot = null;
       history.replaceState(null, "", "#join/" + newSlug);
       saveAndRender();
-      if (supabase) {
-        saveShortSlugToDB(newSlug).catch(() => {});
-      }
+      if (supabase) { saveShortSlugToDB(newSlug).catch(() => {}); }
       toast("New trip created", "success");
     }
 
@@ -2295,30 +2536,23 @@
     });
 
     $("expenseAmount").addEventListener("input", updateExactTotal);
-
     $("tripName").addEventListener("change", () => {
       snapshot();
       state.tripName = $("tripName").value.trim() || "My Trip";
       state.audit.unshift(auditEvent("Renamed trip"));
       saveAndRender();
     });
-
     $("expenseForm").addEventListener("submit", addOrUpdateExpense);
     $("personForm").addEventListener("submit", addPerson);
     $("splitType").addEventListener("change", () => {
       renderRatioInputs();
       renderExactInputs();
     });
-
     $("settlementForm").addEventListener("submit", addSettlement);
-
     $("cancelEditExpense").addEventListener("click", resetExpenseForm);
-
     $("undoBtn").addEventListener("click", restoreSnapshot);
-
     $("confirmRemove").addEventListener("click", removeParticipant);
     $("cancelRemove").addEventListener("click", () => $("removeDialog").close());
-
     $("copyInvite").addEventListener("click", copyInvite);
     $("copyInvite2").addEventListener("click", copyInvite);
     $("randomSlug").addEventListener("click", () => {
@@ -2333,26 +2567,19 @@
     });
     $("saveShortInvite").addEventListener("click", saveShortInvite);
     $("copyShortInvite").addEventListener("click", copyShortInvite);
-
-    // New trip quick button (top pill)
     $("newTripQuick").addEventListener("click", newTripId);
-
     $("copySettlements").addEventListener("click", copySettlements);
-
     $("exportCsv").addEventListener("click", exportCsv);
     $("exportJson").addEventListener("click", exportJson);
     $("importJson").addEventListener("change", importJson);
-
     $("newTrip").addEventListener("click", newTripId);
 
     // ---------- init ----------
     if (state.shortSlug && !location.hash.includes("join")) {
       history.replaceState(null, "", "#join/" + state.shortSlug);
     }
-
     render();
     autoConnectSupabase();
-
     window.__tripshare = { state, tripId, supabase };
   </script>
 </body>
