@@ -183,26 +183,26 @@
     .topbar {
       display: flex;
       flex-wrap: wrap;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
-      gap: 12px 16px;
-      padding: 8px 0 12px;
+      gap: 8px 12px;
+      padding: 4px 0 10px;
       border-bottom: 1px solid var(--line);
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
     .topbar-left { flex: 1 1 200px; }
     .topbar-left p {
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
       margin: 2px 0 0;
       max-width: 560px;
-      line-height: 1.5;
+      line-height: 1.4;
     }
     .topbar-right {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-shrink: 0;
     }
 
@@ -210,7 +210,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 8px 12px;
+      gap: 8px 10px;
       margin-bottom: 12px;
     }
     .trip-name-row input {
@@ -219,7 +219,7 @@
       font-weight: 650;
       padding: 8px 12px;
       min-height: 44px;
-      flex: 1 1 180px;
+      flex: 1 1 160px;
     }
 
     .status-pill {
@@ -245,6 +245,34 @@
       flex-shrink: 0;
     }
     .status-pill .dot.live { background: var(--teal); }
+
+    /* New Trip pill – same as .status-pill but clickable */
+    .pill-new-trip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 12px 4px 10px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
+      font-size: 12px;
+      font-weight: 550;
+      color: var(--muted);
+      white-space: nowrap;
+      min-height: 32px;
+      cursor: pointer;
+      transition: background var(--transition), border-color var(--transition);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font: inherit;
+    }
+    .pill-new-trip:hover {
+      background: var(--paper);
+      border-color: var(--line-strong);
+      color: var(--ink);
+    }
 
     /* ---------- VERTICAL TABS ---------- */
     .app-layout {
@@ -345,20 +373,21 @@
       }
       .tabs-vertical::-webkit-scrollbar { display: none; }
       .tabs-vertical button {
-        padding: 8px 12px;
-        min-height: 36px;
+        padding: 6px 10px;
+        min-height: 34px;
         font-size: 12px;
         white-space: nowrap;
         flex-shrink: 0;
         width: auto;
       }
       .tabs-vertical .tab-icon { margin-right: 4px; }
-      .tabs-vertical button .tab-label { display: none; }
-      .tabs-vertical button[data-tab="dashboard"] .tab-label { display: inline; }
+      /* Show labels for all tabs on mobile */
+      .tabs-vertical button .tab-label { display: inline; }
+      /* Slightly reduce font on very small screens if needed */
     }
 
     @media (max-width: 480px) {
-      .tabs-vertical button { padding: 6px 10px; font-size: 11px; min-height: 32px; }
+      .tabs-vertical button { padding: 4px 8px; font-size: 11px; min-height: 30px; }
       .tabs-vertical .tab-icon { font-size: 14px; }
     }
 
@@ -755,7 +784,7 @@
       .grid-2 { grid-template-columns: 1fr; }
       .form-grid { grid-template-columns: 1fr; }
       .form-grid .wide { grid-column: 1; }
-      .topbar { flex-direction: column; align-items: stretch; gap: 8px; }
+      .topbar { flex-direction: column; align-items: stretch; gap: 4px; }
       .topbar-right { justify-content: flex-start; }
       .trip-name-row input { max-width: 100%; flex: 1; }
       .list-item { grid-template-columns: 1fr; }
@@ -766,7 +795,6 @@
       .ratio-grid { grid-template-columns: 1fr 1fr; }
       .exact-grid { grid-template-columns: 1fr 1fr; }
       .toast-container { bottom: 12px; right: 12px; max-width: calc(100% - 24px); }
-      .trip-name-row .status-pill:last-child { display: none; }
     }
 
     @media (max-width: 600px) {
@@ -822,11 +850,12 @@
       </div>
     </header>
 
-    <!-- TRIP NAME & SHORT SLUG -->
+    <!-- TRIP NAME & SHORT SLUG & TRIP ID & NEW TRIP -->
     <div class="trip-name-row">
       <input id="tripName" aria-label="Trip name" maxlength="80" placeholder="Trip name…" />
       <span class="status-pill">🔗 <span id="shortSlugDisplay"></span></span>
       <span class="status-pill">🆔 <span id="tripIdLabel"></span></span>
+      <button id="newTripQuick" class="pill-new-trip" type="button">🔄 New</button>
     </div>
 
     <!-- VERTICAL TABS + CONTENT -->
@@ -1074,7 +1103,7 @@
   <!-- ===== SCRIPT ===== -->
   <script type="module">
     /* ============================================================
-       TripShare v2 – with vertical tabs, colors, exact split, and sync fix
+       TripShare v2 – final with consistent pill style & mobile tab fix
        ============================================================ */
 
     // ---------- constants ----------
@@ -1389,7 +1418,6 @@
         });
       });
 
-      // Also update when split type changes
       const splitType = $("splitType");
       splitType.addEventListener("change", () => {
         renderRatioInputs();
@@ -1430,12 +1458,10 @@
         </label>
       `).join("");
 
-      // Add event listeners to update total
       wrap.querySelectorAll(".exact-input").forEach(input => {
         input.addEventListener("input", updateExactTotal);
       });
 
-      // Set initial values if editing
       if (isEditingExpense) {
         const editId = Number($("editingExpenseId").value || 0);
         const exp = state.expenses.find(e => e.id === editId);
@@ -1982,7 +2008,6 @@
         supabase = createClient(url, key);
         setSyncStatus("Connecting…", false);
 
-        // 1. Resolve join slug if any
         if (joinSlug) {
           try {
             await resolveShortInvite(joinSlug);
@@ -1991,7 +2016,6 @@
           }
         }
 
-        // 2. Fetch remote state FIRST
         const { data, error } = await supabase
           .from("trip_documents")
           .select("payload")
@@ -1999,16 +2023,13 @@
           .maybeSingle();
         if (error) throw error;
 
-        // 3. Merge remote state into local state (prefer remote)
         if (data?.payload) {
           applyingRemote = true;
           const remoteState = normalizeState(data.payload);
-          // Preserve local people if remote has none (safety)
           if (!remoteState.people || remoteState.people.length === 0) {
             remoteState.people = state.people.length > 0 ? state.people : clone(defaultState.people);
           }
           state = remoteState;
-          // Ensure shortSlug is present
           if (!state.shortSlug) {
             const newSlug = await suggestAlternativeSlug(generateRandomSlug());
             state.shortSlug = newSlug;
@@ -2016,7 +2037,6 @@
           localStorage.setItem(storageKey(), JSON.stringify(state));
           applyingRemote = false;
         } else {
-          // No remote state – this is a new trip. Ensure shortSlug exists.
           if (!state.shortSlug) {
             const newSlug = await suggestAlternativeSlug(generateRandomSlug());
             state.shortSlug = newSlug;
@@ -2024,14 +2044,11 @@
           await saveToCloud();
         }
 
-        // 4. Now that state has a shortSlug, ensure it's saved in short_links
         await saveShortSlugToDB(state.shortSlug);
 
-        // 5. Subscribe to real-time changes
         await subscribeToTrip();
         setSyncStatus("Live sync", true);
 
-        // 6. Update URL hash if we have a short slug and it's not already a join link
         if (state.shortSlug && !location.hash.includes("join")) {
           history.replaceState(null, "", "#join/" + state.shortSlug);
         }
@@ -2270,7 +2287,6 @@
     }
 
     // ---------- event binding ----------
-    // tabs (vertical)
     document.querySelectorAll(".tab").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t === btn));
@@ -2278,10 +2294,8 @@
       });
     });
 
-    // expense amount change triggers exact total update
     $("expenseAmount").addEventListener("input", updateExactTotal);
 
-    // trip name
     $("tripName").addEventListener("change", () => {
       snapshot();
       state.tripName = $("tripName").value.trim() || "My Trip";
@@ -2289,7 +2303,6 @@
       saveAndRender();
     });
 
-    // expense form
     $("expenseForm").addEventListener("submit", addOrUpdateExpense);
     $("personForm").addEventListener("submit", addPerson);
     $("splitType").addEventListener("change", () => {
@@ -2297,20 +2310,15 @@
       renderExactInputs();
     });
 
-    // settlement form
     $("settlementForm").addEventListener("submit", addSettlement);
 
-    // cancel edit
     $("cancelEditExpense").addEventListener("click", resetExpenseForm);
 
-    // undo
     $("undoBtn").addEventListener("click", restoreSnapshot);
 
-    // remove dialog
     $("confirmRemove").addEventListener("click", removeParticipant);
     $("cancelRemove").addEventListener("click", () => $("removeDialog").close());
 
-    // invites
     $("copyInvite").addEventListener("click", copyInvite);
     $("copyInvite2").addEventListener("click", copyInvite);
     $("randomSlug").addEventListener("click", () => {
@@ -2326,15 +2334,15 @@
     $("saveShortInvite").addEventListener("click", saveShortInvite);
     $("copyShortInvite").addEventListener("click", copyShortInvite);
 
-    // settlements
+    // New trip quick button (top pill)
+    $("newTripQuick").addEventListener("click", newTripId);
+
     $("copySettlements").addEventListener("click", copySettlements);
 
-    // export / import
     $("exportCsv").addEventListener("click", exportCsv);
     $("exportJson").addEventListener("click", exportJson);
     $("importJson").addEventListener("change", importJson);
 
-    // new trip
     $("newTrip").addEventListener("click", newTripId);
 
     // ---------- init ----------
@@ -2345,7 +2353,6 @@
     render();
     autoConnectSupabase();
 
-    // ---------- expose for debugging ----------
     window.__tripshare = { state, tripId, supabase };
   </script>
 </body>
