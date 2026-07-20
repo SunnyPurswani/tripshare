@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes" />
   <title>TripShare v2 — shared trip expenses</title>
 
-  <!-- ===== STYLES ===== -->
   <style>
     /* ---------- reset & tokens ---------- */
     *,
@@ -38,6 +37,14 @@
       --radius-sm: 6px;
       --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       --transition: 180ms ease;
+
+      /* Tab colors */
+      --tab-dashboard: #0f766e;
+      --tab-expenses: #2563eb;
+      --tab-people: #7c3aed;
+      --tab-settle: #d97706;
+      --tab-history: #dc2626;
+      --tab-invite: #059669;
     }
 
     html {
@@ -90,7 +97,7 @@
     a { color: var(--teal); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    /* ---------- buttons & inputs (touch‑friendly) ---------- */
+    /* ---------- buttons & inputs ---------- */
     button {
       font: inherit;
       border: 1px solid transparent;
@@ -239,36 +246,123 @@
     }
     .status-pill .dot.live { background: var(--teal); }
 
-    .tabs {
+    /* ---------- VERTICAL TABS ---------- */
+    .app-layout {
       display: flex;
-      gap: 4px;
-      padding: 4px;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .tabs-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 6px;
       background: rgba(255, 255, 255, 0.6);
       backdrop-filter: blur(4px);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      overflow-x: auto;
-      margin-bottom: 16px;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
+      min-width: 140px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 16px;
     }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tabs button {
+    .tabs-vertical button {
       background: transparent;
       color: var(--muted);
       border-color: transparent;
       white-space: nowrap;
-      padding: 6px 14px;
+      padding: 10px 14px;
       font-weight: 550;
       font-size: 13px;
       border-radius: var(--radius-sm);
-      min-height: 36px;
-      flex-shrink: 0;
+      min-height: 44px;
+      justify-content: flex-start;
+      width: 100%;
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
     }
-    .tabs button:hover { background: var(--paper); color: var(--ink-soft); transform: none; box-shadow: none; }
-    .tabs button.active { background: var(--ink); color: #fff; }
-    .tabs button.active:hover { background: var(--ink); filter: brightness(1.05); }
+    .tabs-vertical button:hover {
+      background: var(--paper);
+      color: var(--ink-soft);
+      transform: none;
+      box-shadow: none;
+    }
+    .tabs-vertical button.active {
+      color: #fff;
+    }
+    /* Individual tab colors */
+    .tabs-vertical button[data-tab="dashboard"].active { background: var(--tab-dashboard); }
+    .tabs-vertical button[data-tab="dashboard"]:not(.active):hover { border-color: var(--tab-dashboard); color: var(--tab-dashboard); }
 
+    .tabs-vertical button[data-tab="expenses"].active { background: var(--tab-expenses); }
+    .tabs-vertical button[data-tab="expenses"]:not(.active):hover { border-color: var(--tab-expenses); color: var(--tab-expenses); }
+
+    .tabs-vertical button[data-tab="people"].active { background: var(--tab-people); }
+    .tabs-vertical button[data-tab="people"]:not(.active):hover { border-color: var(--tab-people); color: var(--tab-people); }
+
+    .tabs-vertical button[data-tab="settle"].active { background: var(--tab-settle); }
+    .tabs-vertical button[data-tab="settle"]:not(.active):hover { border-color: var(--tab-settle); color: var(--tab-settle); }
+
+    .tabs-vertical button[data-tab="history"].active { background: var(--tab-history); }
+    .tabs-vertical button[data-tab="history"]:not(.active):hover { border-color: var(--tab-history); color: var(--tab-history); }
+
+    .tabs-vertical button[data-tab="invite"].active { background: var(--tab-invite); }
+    .tabs-vertical button[data-tab="invite"]:not(.active):hover { border-color: var(--tab-invite); color: var(--tab-invite); }
+
+    .tabs-vertical .tab-icon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .content-area {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .section { display: none; animation: fadeUp 220ms ease; }
+    .section.active { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---------- responsive: vertical tabs become horizontal on small screens ---------- */
+    @media (max-width: 820px) {
+      .app-layout {
+        flex-direction: column;
+      }
+      .tabs-vertical {
+        flex-direction: row;
+        overflow-x: auto;
+        min-width: 0;
+        width: 100%;
+        position: static;
+        padding: 4px;
+        gap: 4px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .tabs-vertical::-webkit-scrollbar { display: none; }
+      .tabs-vertical button {
+        padding: 8px 12px;
+        min-height: 36px;
+        font-size: 12px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        width: auto;
+      }
+      .tabs-vertical .tab-icon { margin-right: 4px; }
+      .tabs-vertical button .tab-label { display: none; }
+      .tabs-vertical button[data-tab="dashboard"] .tab-label { display: inline; }
+    }
+
+    @media (max-width: 480px) {
+      .tabs-vertical button { padding: 6px 10px; font-size: 11px; min-height: 32px; }
+      .tabs-vertical .tab-icon { font-size: 14px; }
+    }
+
+    /* ---------- grid & panels ---------- */
     .grid-2 {
       display: grid;
       grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.7fr);
@@ -300,14 +394,6 @@
       margin-bottom: 12px;
     }
     .panel-header h2 { margin-bottom: 0; }
-
-    .section { display: none; animation: fadeUp 220ms ease; }
-    .section.active { display: block; }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
 
     .form-grid {
       display: grid;
@@ -380,6 +466,47 @@
       padding: 4px;
       text-align: center;
       font-size: 14px;
+    }
+
+    /* Exact amount split */
+    .exact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 8px 12px;
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: #f0f9ff;
+      border-radius: var(--radius-sm);
+      border: 1px solid #bae6fd;
+    }
+    .exact-grid label {
+      text-transform: none;
+      font-weight: 500;
+      color: var(--ink-soft);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .exact-grid label input {
+      width: 80px;
+      min-height: 0;
+      padding: 4px;
+      text-align: center;
+      font-size: 14px;
+    }
+    .exact-total {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+      text-align: right;
+    }
+    .exact-total .remaining {
+      font-weight: 600;
+      color: var(--coral);
+    }
+    .exact-total .remaining.zero {
+      color: var(--teal-dark);
     }
 
     .toolbar {
@@ -637,6 +764,7 @@
       .cat-bar-row .cat-amount { grid-column: 2; text-align: left; }
       .stat-card strong { font-size: 20px; }
       .ratio-grid { grid-template-columns: 1fr 1fr; }
+      .exact-grid { grid-template-columns: 1fr 1fr; }
       .toast-container { bottom: 12px; right: 12px; max-width: calc(100% - 24px); }
       .trip-name-row .status-pill:last-child { display: none; }
     }
@@ -645,9 +773,9 @@
       .app { padding: 10px 10px 20px; }
       .topbar-left h1 { font-size: 24px; }
       .topbar-left p { font-size: 13px; }
-      .tabs button { padding: 4px 10px; font-size: 12px; min-height: 32px; }
       .panel { padding: 12px; }
       .ratio-grid { grid-template-columns: 1fr; }
+      .exact-grid { grid-template-columns: 1fr; }
       .grid-3 { grid-template-columns: 1fr 1fr; }
       .stat-card { padding: 10px; }
       .stat-card strong { font-size: 18px; }
@@ -666,8 +794,6 @@
 
     @media (max-width: 420px) {
       .grid-3 { grid-template-columns: 1fr; }
-      .tabs { gap: 2px; padding: 2px; }
-      .tabs button { padding: 4px 8px; font-size: 11px; }
       .topbar-left h1 { font-size: 20px; }
       .panel { padding: 10px; }
       .stat-card { padding: 8px; }
@@ -685,7 +811,7 @@
     <header class="topbar">
       <div class="topbar-left">
         <h1>TripShare</h1>
-        <p>Shared trip expenses &bull; equal/ratio splits &bull; live sync</p>
+        <p>Shared trip expenses &bull; equal/ratio/exact splits &bull; live sync</p>
       </div>
       <div class="topbar-right">
         <span class="status-pill">
@@ -703,206 +829,230 @@
       <span class="status-pill">🆔 <span id="tripIdLabel"></span></span>
     </div>
 
-    <!-- TABS -->
-    <nav class="tabs" aria-label="Sections">
-      <button class="tab active" data-tab="dashboard" type="button">📊 Dashboard</button>
-      <button class="tab" data-tab="expenses" type="button">🧾 Expenses</button>
-      <button class="tab" data-tab="people" type="button">👤 People</button>
-      <button class="tab" data-tab="settle" type="button">⚖️ Settle</button>
-      <button class="tab" data-tab="history" type="button">📜 History</button>
-      <button class="tab" data-tab="invite" type="button">🔗 Invite</button>
-    </nav>
+    <!-- VERTICAL TABS + CONTENT -->
+    <div class="app-layout">
 
-    <!-- ===== DASHBOARD ===== -->
-    <section id="dashboard" class="section active">
-      <div class="grid-3" style="margin-bottom:16px;">
-        <div class="stat-card"><span>Total spend</span><strong id="totalSpend">GBP 0.00</strong></div>
-        <div class="stat-card"><span>Expenses</span><strong id="expenseCount">0</strong></div>
-        <div class="stat-card"><span>Participants</span><strong id="personCount">0</strong></div>
-      </div>
-      <div class="grid-2">
-        <div class="panel">
-          <h2>Balances</h2>
-          <div id="balanceWrap"></div>
-          <div style="margin-top:16px; border-top:1px solid var(--line); padding-top:14px;">
-            <h3 style="margin-bottom:6px;">⚡ Settlement preview</h3>
-            <div id="settlementPreview"></div>
+      <!-- TABS -->
+      <nav class="tabs-vertical" aria-label="Sections">
+        <button class="tab active" data-tab="dashboard" type="button">
+          <span class="tab-icon">📊</span><span class="tab-label">Dashboard</span>
+        </button>
+        <button class="tab" data-tab="expenses" type="button">
+          <span class="tab-icon">🧾</span><span class="tab-label">Expenses</span>
+        </button>
+        <button class="tab" data-tab="people" type="button">
+          <span class="tab-icon">👤</span><span class="tab-label">People</span>
+        </button>
+        <button class="tab" data-tab="settle" type="button">
+          <span class="tab-icon">⚖️</span><span class="tab-label">Settle</span>
+        </button>
+        <button class="tab" data-tab="history" type="button">
+          <span class="tab-icon">📜</span><span class="tab-label">History</span>
+        </button>
+        <button class="tab" data-tab="invite" type="button">
+          <span class="tab-icon">🔗</span><span class="tab-label">Invite</span>
+        </button>
+      </nav>
+
+      <!-- CONTENT AREA -->
+      <div class="content-area">
+
+        <!-- ===== DASHBOARD ===== -->
+        <section id="dashboard" class="section active">
+          <div class="grid-3" style="margin-bottom:16px;">
+            <div class="stat-card"><span>Total spend</span><strong id="totalSpend">GBP 0.00</strong></div>
+            <div class="stat-card"><span>Expenses</span><strong id="expenseCount">0</strong></div>
+            <div class="stat-card"><span>Participants</span><strong id="personCount">0</strong></div>
           </div>
-        </div>
-        <div class="panel">
-          <h2>Categories</h2>
-          <div id="categoryBars" class="category-bars"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== EXPENSES ===== -->
-    <section id="expenses" class="section">
-      <div class="grid-2">
-        <form id="expenseForm" class="panel">
-          <h2 id="expenseFormTitle">Add expense</h2>
-          <input id="editingExpenseId" type="hidden" />
-          <div class="form-grid">
-            <label>Date <input id="expenseDate" type="date" required /></label>
-            <label>Amount <input id="expenseAmount" type="number" step="0.01" min="0.01" required /></label>
-            <label class="wide">Description <input id="expenseDescription" maxlength="120" required /></label>
-            <label>Paid by <select id="paidBy" required></select></label>
-            <label>Category
-              <select id="category">
-                <option>Food</option><option>Drinks</option><option>Hotel</option>
-                <option>Fuel</option><option>Activities</option><option>Shopping</option>
-                <option>Transport</option><option>Other</option>
-              </select>
-            </label>
-            <label>Split type
-              <select id="splitType">
-                <option value="equal">Equal</option>
-                <option value="ratio">Ratio</option>
-              </select>
-            </label>
-            <div class="wide">
-              <h3>Shared by</h3>
-              <div id="shareChips" class="chips"></div>
-              <div id="ratioWeights" class="ratio-grid hidden"></div>
+          <div class="grid-2">
+            <div class="panel">
+              <h2>Balances</h2>
+              <div id="balanceWrap"></div>
+              <div style="margin-top:16px; border-top:1px solid var(--line); padding-top:14px;">
+                <h3 style="margin-bottom:6px;">⚡ Settlement preview</h3>
+                <div id="settlementPreview"></div>
+              </div>
+            </div>
+            <div class="panel">
+              <h2>Categories</h2>
+              <div id="categoryBars" class="category-bars"></div>
             </div>
           </div>
-          <div class="toolbar">
-            <button id="cancelEditExpense" class="btn-ghost hidden" type="button">Cancel edit</button>
-            <button class="btn-accent" type="submit">💾 Save expense</button>
-          </div>
-        </form>
+        </section>
 
-        <div class="panel">
-          <div class="panel-header">
-            <h2>Expenses <small id="expenseCountSmall">0</small></h2>
-            <button id="exportCsv" class="btn-ghost btn-sm" type="button">⬇ CSV</button>
-          </div>
-          <div id="expenseList" class="list"></div>
-        </div>
-      </div>
-    </section>
+        <!-- ===== EXPENSES ===== -->
+        <section id="expenses" class="section">
+          <div class="grid-2">
+            <form id="expenseForm" class="panel">
+              <h2 id="expenseFormTitle">Add expense</h2>
+              <input id="editingExpenseId" type="hidden" />
+              <div class="form-grid">
+                <label>Date <input id="expenseDate" type="date" required /></label>
+                <label>Amount <input id="expenseAmount" type="number" step="0.01" min="0.01" required /></label>
+                <label class="wide">Description <input id="expenseDescription" maxlength="120" required /></label>
+                <label>Paid by <select id="paidBy" required></select></label>
+                <label>Category
+                  <select id="category">
+                    <option>Food</option><option>Drinks</option><option>Hotel</option>
+                    <option>Fuel</option><option>Activities</option><option>Shopping</option>
+                    <option>Transport</option><option>Other</option>
+                  </select>
+                </label>
+                <label>Split type
+                  <select id="splitType">
+                    <option value="equal">Equal</option>
+                    <option value="ratio">Ratio</option>
+                    <option value="exact">Exact Amount</option>
+                  </select>
+                </label>
+                <div class="wide">
+                  <h3>Shared by</h3>
+                  <div id="shareChips" class="chips"></div>
+                  <div id="ratioWeights" class="ratio-grid hidden"></div>
+                  <div id="exactAmounts" class="exact-grid hidden"></div>
+                  <div id="exactTotal" class="exact-total hidden"></div>
+                </div>
+              </div>
+              <div class="toolbar">
+                <button id="cancelEditExpense" class="btn-ghost hidden" type="button">Cancel edit</button>
+                <button class="btn-accent" type="submit">💾 Save expense</button>
+              </div>
+            </form>
 
-    <!-- ===== PEOPLE ===== -->
-    <section id="people" class="section">
-      <div class="grid-2">
-        <form id="personForm" class="panel">
-          <h2>Add participant</h2>
-          <div class="row">
-            <input id="personName" maxlength="40" placeholder="Name" required />
-            <button class="btn-accent" type="submit">➕ Add</button>
-          </div>
-        </form>
-        <div class="panel">
-          <div class="panel-header">
-            <h2>Participants <small id="personCountSmall">0</small></h2>
-            <button id="undoBtn" class="btn-ghost btn-sm" type="button" disabled>↩ Undo</button>
-          </div>
-          <div id="participantList" class="list"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== SETTLE ===== -->
-    <section id="settle" class="section">
-      <div class="grid-2">
-        <div class="panel">
-          <h2>Record a payment (partial settlement)</h2>
-          <form id="settlementForm" class="form-grid" style="grid-template-columns:1fr 1fr; gap:10px;">
-            <label>From
-              <select id="settlementFrom" required>
-                <option value="">—</option>
-              </select>
-            </label>
-            <label>To
-              <select id="settlementTo" required>
-                <option value="">—</option>
-              </select>
-            </label>
-            <label>Amount
-              <input id="settlementAmount" type="number" step="0.01" min="0.01" required />
-            </label>
-            <label>Date
-              <input id="settlementDate" type="date" required />
-            </label>
-            <div class="wide" style="grid-column:1/-1; display:flex; gap:8px; justify-content:flex-end;">
-              <button type="submit" class="btn-accent">💸 Record payment</button>
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Expenses <small id="expenseCountSmall">0</small></h2>
+                <button id="exportCsv" class="btn-ghost btn-sm" type="button">⬇ CSV</button>
+              </div>
+              <div id="expenseList" class="list"></div>
             </div>
-          </form>
-          <div style="margin-top:16px; border-top:1px solid var(--line); padding-top:14px;">
-            <h3>Manual settlements</h3>
-            <div id="manualSettlementsList" class="list"></div>
           </div>
-        </div>
+        </section>
 
-        <div class="panel">
-          <h2>Suggested remaining settlements</h2>
-          <div id="settlements" class="list"></div>
-          <div class="toolbar">
-            <button id="copySettlements" class="btn-accent" type="button">📋 Copy settlements</button>
-          </div>
-          <hr style="border:0;border-top:1px solid var(--line);margin:16px 0;" />
-          <h2>Export / Import</h2>
-          <div class="row" style="margin-bottom:10px;">
-            <button id="exportJson" class="btn-ghost" type="button">⬇ Export JSON</button>
-            <label class="btn-ghost" style="border:1px solid var(--line); border-radius:var(--radius-sm); padding:8px 14px; min-height:44px; cursor:pointer; font-weight:550; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
-              📤 Import JSON
-              <input id="importJson" type="file" accept="application/json,.json" class="hidden" />
-            </label>
-          </div>
-          <div class="notice notice-info">Import overwrites current trip data. Export includes full state.</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== HISTORY ===== -->
-    <section id="history" class="section">
-      <div class="panel">
-        <h2>Audit log</h2>
-        <div id="auditLog" class="list"></div>
-      </div>
-    </section>
-
-    <!-- ===== INVITE ===== -->
-    <section id="invite" class="section">
-      <div class="grid-2">
-        <div class="panel">
-          <h2>🔗 Invite links</h2>
-          <label>Full invite link
-            <input id="inviteLink" readonly />
-          </label>
-          <div class="toolbar toolbar-start">
-            <button id="newTrip" class="btn-ghost btn-sm" type="button">🔄 New trip</button>
-            <button id="copyInvite2" class="btn-accent btn-sm" type="button">📋 Copy</button>
-          </div>
-
-          <hr style="border:0;border-top:1px solid var(--line);margin:16px 0;" />
-
-          <label>Short slug (5‑6 letters)
-            <div class="row">
-              <input id="shortSlug" maxlength="32" placeholder="dexter" style="flex:1;" />
-              <button id="randomSlug" class="btn-ghost btn-sm" type="button">🎲 Random</button>
+        <!-- ===== PEOPLE ===== -->
+        <section id="people" class="section">
+          <div class="grid-2">
+            <form id="personForm" class="panel">
+              <h2>Add participant</h2>
+              <div class="row">
+                <input id="personName" maxlength="40" placeholder="Name" required />
+                <button class="btn-accent" type="submit">➕ Add</button>
+              </div>
+            </form>
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Participants <small id="personCountSmall">0</small></h2>
+                <button id="undoBtn" class="btn-ghost btn-sm" type="button" disabled>↩ Undo</button>
+              </div>
+              <div id="participantList" class="list"></div>
             </div>
-          </label>
-          <label style="margin-top:8px;">Short invite link
-            <input id="shortInviteLink" readonly />
-          </label>
-          <div class="toolbar">
-            <button id="saveShortInvite" class="btn-accent" type="button">💾 Save short link</button>
-            <button id="copyShortInvite" class="btn-ghost" type="button">📋 Copy</button>
           </div>
+        </section>
 
-          <div class="notice notice-info" style="margin-top:16px;">
-            The short slug is stored in the cloud and makes your invite link memorable.
+        <!-- ===== SETTLE ===== -->
+        <section id="settle" class="section">
+          <div class="grid-2">
+            <div class="panel">
+              <h2>Record a payment (partial settlement)</h2>
+              <form id="settlementForm" class="form-grid" style="grid-template-columns:1fr 1fr; gap:10px;">
+                <label>From
+                  <select id="settlementFrom" required>
+                    <option value="">—</option>
+                  </select>
+                </label>
+                <label>To
+                  <select id="settlementTo" required>
+                    <option value="">—</option>
+                  </select>
+                </label>
+                <label>Amount
+                  <input id="settlementAmount" type="number" step="0.01" min="0.01" required />
+                </label>
+                <label>Date
+                  <input id="settlementDate" type="date" required />
+                </label>
+                <div class="wide" style="grid-column:1/-1; display:flex; gap:8px; justify-content:flex-end;">
+                  <button type="submit" class="btn-accent">💸 Record payment</button>
+                </div>
+              </form>
+              <div style="margin-top:16px; border-top:1px solid var(--line); padding-top:14px;">
+                <h3>Manual settlements</h3>
+                <div id="manualSettlementsList" class="list"></div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h2>Suggested remaining settlements</h2>
+              <div id="settlements" class="list"></div>
+              <div class="toolbar">
+                <button id="copySettlements" class="btn-accent" type="button">📋 Copy settlements</button>
+              </div>
+              <hr style="border:0;border-top:1px solid var(--line);margin:16px 0;" />
+              <h2>Export / Import</h2>
+              <div class="row" style="margin-bottom:10px;">
+                <button id="exportJson" class="btn-ghost" type="button">⬇ Export JSON</button>
+                <label class="btn-ghost" style="border:1px solid var(--line); border-radius:var(--radius-sm); padding:8px 14px; min-height:44px; cursor:pointer; font-weight:550; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
+                  📤 Import JSON
+                  <input id="importJson" type="file" accept="application/json,.json" class="hidden" />
+                </label>
+              </div>
+              <div class="notice notice-info">Import overwrites current trip data. Export includes full state.</div>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div class="panel">
-          <h2>Sync status</h2>
-          <p id="syncStatusDetail" style="color:var(--muted);">Local – changes are saved locally.</p>
-          <p style="font-size:13px; color:var(--muted);">The app automatically syncs with the cloud when online.</p>
-        </div>
-      </div>
-    </section>
+        <!-- ===== HISTORY ===== -->
+        <section id="history" class="section">
+          <div class="panel">
+            <h2>Audit log</h2>
+            <div id="auditLog" class="list"></div>
+          </div>
+        </section>
+
+        <!-- ===== INVITE ===== -->
+        <section id="invite" class="section">
+          <div class="grid-2">
+            <div class="panel">
+              <h2>🔗 Invite links</h2>
+              <label>Full invite link
+                <input id="inviteLink" readonly />
+              </label>
+              <div class="toolbar toolbar-start">
+                <button id="newTrip" class="btn-ghost btn-sm" type="button">🔄 New trip</button>
+                <button id="copyInvite2" class="btn-accent btn-sm" type="button">📋 Copy</button>
+              </div>
+
+              <hr style="border:0;border-top:1px solid var(--line);margin:16px 0;" />
+
+              <label>Short slug (5‑6 letters)
+                <div class="row">
+                  <input id="shortSlug" maxlength="32" placeholder="dexter" style="flex:1;" />
+                  <button id="randomSlug" class="btn-ghost btn-sm" type="button">🎲 Random</button>
+                </div>
+              </label>
+              <label style="margin-top:8px;">Short invite link
+                <input id="shortInviteLink" readonly />
+              </label>
+              <div class="toolbar">
+                <button id="saveShortInvite" class="btn-accent" type="button">💾 Save short link</button>
+                <button id="copyShortInvite" class="btn-ghost" type="button">📋 Copy</button>
+              </div>
+
+              <div class="notice notice-info" style="margin-top:16px;">
+                The short slug is stored in the cloud and makes your invite link memorable.
+              </div>
+            </div>
+
+            <div class="panel">
+              <h2>Sync status</h2>
+              <p id="syncStatusDetail" style="color:var(--muted);">Local – changes are saved locally.</p>
+              <p style="font-size:13px; color:var(--muted);">The app automatically syncs with the cloud when online.</p>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /content-area -->
+    </div><!-- /app-layout -->
 
   </main>
 
@@ -924,7 +1074,7 @@
   <!-- ===== SCRIPT ===== -->
   <script type="module">
     /* ============================================================
-       TripShare v2 – with manual partial settlements & negative‑zero fix
+       TripShare v2 – with vertical tabs, colors, exact split, and sync fix
        ============================================================ */
 
     // ---------- constants ----------
@@ -1233,21 +1383,90 @@
         </label>
       `).join("");
       document.querySelectorAll('input[name="sharedBy"]').forEach(input => {
-        input.addEventListener("change", renderRatioInputs);
+        input.addEventListener("change", () => {
+          renderRatioInputs();
+          renderExactInputs();
+        });
       });
+
+      // Also update when split type changes
+      const splitType = $("splitType");
+      splitType.addEventListener("change", () => {
+        renderRatioInputs();
+        renderExactInputs();
+      });
+
       renderRatioInputs();
+      renderExactInputs();
     }
 
     function renderRatioInputs() {
       const isRatio = $("splitType").value === "ratio";
       const wrap = $("ratioWeights");
       wrap.classList.toggle("hidden", !isRatio);
+      if (!isRatio) return;
       const selected = selectedParticipants();
       wrap.innerHTML = selected.map(name => `
         <label>${escapeHtml(name)}
           <input type="number" min="0.01" step="0.01" value="1" data-ratio-for="${escapeAttr(name)}" />
         </label>
       `).join("");
+    }
+
+    function renderExactInputs() {
+      const isExact = $("splitType").value === "exact";
+      const wrap = $("exactAmounts");
+      const totalWrap = $("exactTotal");
+      wrap.classList.toggle("hidden", !isExact);
+      totalWrap.classList.toggle("hidden", !isExact);
+      if (!isExact) return;
+
+      const selected = selectedParticipants();
+      const totalAmount = Number($("expenseAmount").value) || 0;
+
+      wrap.innerHTML = selected.map(name => `
+        <label>${escapeHtml(name)}
+          <input type="number" min="0" step="0.01" value="0" data-exact-for="${escapeAttr(name)}" class="exact-input" />
+        </label>
+      `).join("");
+
+      // Add event listeners to update total
+      wrap.querySelectorAll(".exact-input").forEach(input => {
+        input.addEventListener("input", updateExactTotal);
+      });
+
+      // Set initial values if editing
+      if (isEditingExpense) {
+        const editId = Number($("editingExpenseId").value || 0);
+        const exp = state.expenses.find(e => e.id === editId);
+        if (exp?.exactAmounts) {
+          for (const [name, val] of Object.entries(exp.exactAmounts)) {
+            const inp = wrap.querySelector(`[data-exact-for="${cssEscape(name)}"]`);
+            if (inp) inp.value = val;
+          }
+        }
+      }
+
+      updateExactTotal();
+    }
+
+    function updateExactTotal() {
+      const inputs = document.querySelectorAll(".exact-input");
+      let total = 0;
+      inputs.forEach(inp => {
+        total += Number(inp.value) || 0;
+      });
+      const expenseTotal = Number($("expenseAmount").value) || 0;
+      const remaining = roundMoney(expenseTotal - total);
+      const totalWrap = $("exactTotal");
+      if (expenseTotal > 0) {
+        totalWrap.innerHTML = `
+          Allocated: ${currency.format(total)} &nbsp;|&nbsp;
+          Remaining: <span class="remaining ${Math.abs(remaining) < 0.005 ? 'zero' : ''}">${currency.format(remaining)}</span>
+        `;
+      } else {
+        totalWrap.textContent = "Enter an amount first";
+      }
     }
 
     function selectedParticipants() {
@@ -1257,25 +1476,57 @@
     function splitShares() {
       const selected = selectedParticipants();
       if (!selected.length) throw new Error("Choose at least one participant.");
-      if ($("splitType").value === "equal") {
+
+      const splitType = $("splitType").value;
+
+      if (splitType === "equal") {
         const share = 1 / selected.length;
         return {
           splitShares: Object.fromEntries(selected.map(n => [n, share])),
           ratioWeights: null,
+          exactAmounts: null,
         };
       }
-      const weights = {};
-      for (const name of selected) {
-        const input = document.querySelector(`[data-ratio-for="${cssEscape(name)}"]`);
-        const val = Number(input?.value || 0);
-        if (val <= 0) throw new Error(`Ratio weight for "${name}" must be > 0.`);
-        weights[name] = val;
+
+      if (splitType === "ratio") {
+        const weights = {};
+        for (const name of selected) {
+          const input = document.querySelector(`[data-ratio-for="${cssEscape(name)}"]`);
+          const val = Number(input?.value || 0);
+          if (val <= 0) throw new Error(`Ratio weight for "${name}" must be > 0.`);
+          weights[name] = val;
+        }
+        const total = sum(Object.values(weights));
+        return {
+          splitShares: Object.fromEntries(Object.entries(weights).map(([n, w]) => [n, w / total])),
+          ratioWeights: weights,
+          exactAmounts: null,
+        };
       }
-      const total = sum(Object.values(weights));
-      return {
-        splitShares: Object.fromEntries(Object.entries(weights).map(([n, w]) => [n, w / total])),
-        ratioWeights: weights,
-      };
+
+      if (splitType === "exact") {
+        const amounts = {};
+        let totalAmount = 0;
+        for (const name of selected) {
+          const input = document.querySelector(`[data-exact-for="${cssEscape(name)}"]`);
+          const val = Number(input?.value || 0);
+          if (val < 0) throw new Error(`Amount for "${name}" cannot be negative.`);
+          amounts[name] = val;
+          totalAmount += val;
+        }
+        const expenseTotal = Number($("expenseAmount").value) || 0;
+        if (Math.abs(totalAmount - expenseTotal) > 0.005) {
+          throw new Error(`Total allocated (${currency.format(totalAmount)}) does not equal expense amount (${currency.format(expenseTotal)}).`);
+        }
+        const total = sum(Object.values(amounts));
+        return {
+          splitShares: Object.fromEntries(Object.entries(amounts).map(([n, amt]) => [n, total > 0 ? amt / total : 0])),
+          ratioWeights: null,
+          exactAmounts: amounts,
+        };
+      }
+
+      throw new Error("Unknown split type");
     }
 
     // -- expenses --
@@ -1291,12 +1542,19 @@
       const sorted = [...state.expenses].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
       wrap.innerHTML = sorted.map(exp => {
         const participants = Object.keys(exp.splitShares || {});
+        let splitDetail = `${exp.splitType} split`;
+        if (exp.splitType === 'exact' && exp.exactAmounts) {
+          const details = Object.entries(exp.exactAmounts).map(([name, amt]) => `${name}: ${currency.format(amt)}`).join(', ');
+          splitDetail = `Exact: ${details}`;
+        } else {
+          splitDetail = `${exp.splitType} split with ${participants.map(escapeHtml).join(", ")}`;
+        }
         return `
           <div class="list-item">
             <div class="main">
               <strong>${escapeHtml(exp.description)}</strong>
               <div class="meta">${escapeHtml(exp.date)} <span class="sep">·</span> ${escapeHtml(exp.category)} <span class="sep">·</span> paid by ${escapeHtml(exp.paidBy)}</div>
-              <div class="meta">${escapeHtml(exp.splitType)} split with ${participants.map(escapeHtml).join(", ")}</div>
+              <div class="meta">${splitDetail}</div>
               <div class="actions">
                 <button class="btn-ghost btn-xs edit-expense" data-id="${exp.id}" type="button">✎ Edit</button>
                 <button class="btn-ghost btn-xs delete-expense" data-id="${exp.id}" type="button">✕ Delete</button>
@@ -1329,11 +1587,9 @@
             <thead><tr><th>Name</th><th>Paid</th><th>Owes</th><th>Settlements</th><th>Balance</th></tr></thead>
             <tbody>${state.people.map(name => {
               const b = balances[name] || { paid: 0, owes: 0, net: 0 };
-              // compute settlement net for display
               const settledReceived = sum(state.settlements.filter(s => s.to === name).map(s => s.amount));
               const settledPaid = sum(state.settlements.filter(s => s.from === name).map(s => s.amount));
               const settlementNet = settledReceived - settledPaid;
-              // Format balance: show 0 without negative sign if near zero
               const net = b.net;
               const displayNet = Math.abs(net) < 0.005 ? 0 : net;
               const balanceClass = displayNet >= 0 ? "positive" : "negative";
@@ -1371,7 +1627,7 @@
         `).join("");
       }
 
-      // ---- Settlement preview on dashboard (remaining suggested settlements) ----
+      // ---- Settlement preview on dashboard ----
       const settlements = calculateSettlements();
       const previewWrap = $("settlementPreview");
       if (!settlements.length) {
@@ -1447,14 +1703,12 @@
     // ---------- calculations with settlements ----------
     function calculateBalances() {
       const b = Object.fromEntries(state.people.map(n => [n, { paid: 0, owes: 0, net: 0 }]));
-      // add expense contributions
       for (const exp of state.expenses) {
         if (b[exp.paidBy]) b[exp.paidBy].paid += exp.amount;
         for (const [name, share] of Object.entries(exp.splitShares || {})) {
           if (b[name]) b[name].owes += exp.amount * share;
         }
       }
-      // add manual settlements: if A pays B, A's net increases (debt reduced), B's net decreases (received)
       for (const s of state.settlements) {
         if (b[s.from] && b[s.to]) {
           b[s.from].net += s.amount;
@@ -1512,6 +1766,7 @@
         splitType: $("splitType").value,
         splitShares: split.splitShares,
         ratioWeights: split.ratioWeights,
+        exactAmounts: split.exactAmounts,
       };
       if (!expense.description || expense.amount <= 0) {
         toast("Please fill in description and amount.", "error");
@@ -1553,11 +1808,19 @@
         input.checked = Object.hasOwn(exp.splitShares || {}, input.value);
       });
       renderRatioInputs();
+      renderExactInputs();
       if (exp.ratioWeights) {
         for (const [name, val] of Object.entries(exp.ratioWeights)) {
           const inp = document.querySelector(`[data-ratio-for="${cssEscape(name)}"]`);
           if (inp) inp.value = val;
         }
+      }
+      if (exp.exactAmounts) {
+        for (const [name, val] of Object.entries(exp.exactAmounts)) {
+          const inp = document.querySelector(`[data-exact-for="${cssEscape(name)}"]`);
+          if (inp) inp.value = val;
+        }
+        updateExactTotal();
       }
       document.querySelector('[data-tab="expenses"]').click();
       $("expenseDescription").focus();
@@ -1641,6 +1904,13 @@
           next.splitShares = Object.fromEntries(
             Object.entries(next.ratioWeights).map(([p, w]) => [p, w / totalW])
           );
+        } else if (next.splitType === "exact" && next.exactAmounts) {
+          delete next.exactAmounts[name];
+          const totalExact = sum(Object.values(next.exactAmounts));
+          if (totalExact <= 0) continue;
+          next.splitShares = Object.fromEntries(
+            Object.entries(next.exactAmounts).map(([p, amt]) => [p, amt / totalExact])
+          );
         } else {
           delete next.splitShares[name];
           const parts = Object.keys(next.splitShares);
@@ -1699,7 +1969,7 @@
       toast("Settlement deleted", "success");
     }
 
-    // ---------- sync (auto-connect, no UI) ----------
+    // ---------- sync (auto-connect, with fix) ----------
     async function autoConnectSupabase() {
       const url = APP_SUPABASE_URL;
       const key = APP_SUPABASE_ANON_KEY;
@@ -1711,6 +1981,8 @@
         const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm");
         supabase = createClient(url, key);
         setSyncStatus("Connecting…", false);
+
+        // 1. Resolve join slug if any
         if (joinSlug) {
           try {
             await resolveShortInvite(joinSlug);
@@ -1718,43 +1990,52 @@
             toast(e.message, "error");
           }
         }
-        if (state.shortSlug) {
-          const available = await checkSlugUniqueness(state.shortSlug);
-          if (!available) {
-            const newSlug = await suggestAlternativeSlug(state.shortSlug);
-            state.shortSlug = newSlug;
-            toast(`Slug "${state.shortSlug}" taken, using "${newSlug}"`, "info");
-          }
-          await saveShortSlugToDB(state.shortSlug);
-        } else {
-          const newSlug = await suggestAlternativeSlug(generateRandomSlug());
-          state.shortSlug = newSlug;
-          await saveShortSlugToDB(newSlug);
-          saveAndRender();
-        }
 
+        // 2. Fetch remote state FIRST
         const { data, error } = await supabase
           .from("trip_documents")
           .select("payload")
           .eq("id", tripId)
           .maybeSingle();
         if (error) throw error;
+
+        // 3. Merge remote state into local state (prefer remote)
         if (data?.payload) {
           applyingRemote = true;
-          state = normalizeState(data.payload);
-          if (!state.people || state.people.length === 0) {
-            state.people = clone(defaultState.people);
+          const remoteState = normalizeState(data.payload);
+          // Preserve local people if remote has none (safety)
+          if (!remoteState.people || remoteState.people.length === 0) {
+            remoteState.people = state.people.length > 0 ? state.people : clone(defaultState.people);
+          }
+          state = remoteState;
+          // Ensure shortSlug is present
+          if (!state.shortSlug) {
+            const newSlug = await suggestAlternativeSlug(generateRandomSlug());
+            state.shortSlug = newSlug;
           }
           localStorage.setItem(storageKey(), JSON.stringify(state));
           applyingRemote = false;
         } else {
+          // No remote state – this is a new trip. Ensure shortSlug exists.
+          if (!state.shortSlug) {
+            const newSlug = await suggestAlternativeSlug(generateRandomSlug());
+            state.shortSlug = newSlug;
+          }
           await saveToCloud();
         }
+
+        // 4. Now that state has a shortSlug, ensure it's saved in short_links
+        await saveShortSlugToDB(state.shortSlug);
+
+        // 5. Subscribe to real-time changes
         await subscribeToTrip();
         setSyncStatus("Live sync", true);
+
+        // 6. Update URL hash if we have a short slug and it's not already a join link
         if (state.shortSlug && !location.hash.includes("join")) {
           history.replaceState(null, "", "#join/" + state.shortSlug);
         }
+
         render();
         toast("Connected to cloud", "success");
       } catch (err) {
@@ -1989,13 +2270,16 @@
     }
 
     // ---------- event binding ----------
-    // tabs
+    // tabs (vertical)
     document.querySelectorAll(".tab").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t === btn));
         document.querySelectorAll(".section").forEach(s => s.classList.toggle("active", s.id === btn.dataset.tab));
       });
     });
+
+    // expense amount change triggers exact total update
+    $("expenseAmount").addEventListener("input", updateExactTotal);
 
     // trip name
     $("tripName").addEventListener("change", () => {
@@ -2008,7 +2292,10 @@
     // expense form
     $("expenseForm").addEventListener("submit", addOrUpdateExpense);
     $("personForm").addEventListener("submit", addPerson);
-    $("splitType").addEventListener("change", renderRatioInputs);
+    $("splitType").addEventListener("change", () => {
+      renderRatioInputs();
+      renderExactInputs();
+    });
 
     // settlement form
     $("settlementForm").addEventListener("submit", addSettlement);
