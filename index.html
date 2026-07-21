@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes" />
   <title>TripShare v2 — shared trip expenses</title>
   <style>
-    /* ---------- reset & tokens ---------- */
+    /* ---------- all styles (same as before, keep untouched) ---------- */
+    /* ... (paste your existing CSS here) ... */
+    /* But I'll include them below for completeness */
     *,
     *::before,
     *::after {
       box-sizing: border-box;
       margin: 0;
     }
-
     :root {
       --teal: #0f766e;
       --teal-dark: #115e59;
@@ -43,7 +44,6 @@
       --tab-history: #dc2626;
       --tab-invite: #059669;
     }
-
     html {
       font-family: var(--font);
       color: var(--ink);
@@ -51,16 +51,11 @@
       -webkit-font-smoothing: antialiased;
       -webkit-tap-highlight-color: transparent;
     }
-
     body {
       margin: 0;
       min-height: 100vh;
-      background:
-        radial-gradient(ellipse at 20% 20%, rgba(15, 118, 110, 0.04), transparent 60%),
-        radial-gradient(ellipse at 80% 80%, rgba(220, 107, 74, 0.04), transparent 60%),
-        var(--paper);
+      background: radial-gradient(ellipse at 20% 20%, rgba(15, 118, 110, 0.04), transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(220, 107, 74, 0.04), transparent 60%), var(--paper);
     }
-
     h1,
     h2,
     h3,
@@ -103,8 +98,6 @@
     a:hover {
       text-decoration: underline;
     }
-
-    /* ---------- buttons & inputs ---------- */
     button {
       font: inherit;
       border: 1px solid transparent;
@@ -139,7 +132,6 @@
       transform: none !important;
       box-shadow: none !important;
     }
-
     .btn-ghost {
       background: transparent;
       color: var(--ink-soft);
@@ -150,7 +142,6 @@
       border-color: var(--line-strong);
       color: var(--ink);
     }
-
     .btn-accent {
       background: var(--teal);
       color: #fff;
@@ -158,7 +149,6 @@
     .btn-accent:hover {
       background: var(--teal-dark);
     }
-
     .btn-danger {
       background: var(--coral);
       color: #fff;
@@ -166,7 +156,6 @@
     .btn-danger:hover {
       background: #b5533a;
     }
-
     .btn-sm {
       min-height: 36px;
       padding: 6px 12px;
@@ -178,7 +167,6 @@
       font-size: 11px;
       border-radius: 4px;
     }
-
     input,
     select,
     textarea {
@@ -223,14 +211,11 @@
       color: var(--ink-soft);
       font-size: 13px;
     }
-
-    /* ---------- layout ---------- */
     .app {
       max-width: 1280px;
       margin: 0 auto;
       padding: 16px 16px 32px;
     }
-
     .topbar {
       display: flex;
       flex-wrap: wrap;
@@ -258,7 +243,6 @@
       gap: 6px;
       flex-shrink: 0;
     }
-
     .trip-name-row {
       display: flex;
       flex-wrap: wrap;
@@ -275,7 +259,6 @@
       flex: 1 1 160px;
       min-width: 120px;
     }
-
     .status-pill {
       display: inline-flex;
       align-items: center;
@@ -301,8 +284,6 @@
     .status-pill .dot.live {
       background: var(--teal);
     }
-
-    /* New Trip pill – same as .status-pill but clickable */
     .pill-new-trip {
       display: inline-flex;
       align-items: center;
@@ -326,14 +307,11 @@
       border-color: var(--line-strong);
       color: var(--ink);
     }
-
-    /* ---------- VERTICAL TABS ---------- */
     .app-layout {
       display: flex;
       gap: 20px;
       align-items: flex-start;
     }
-
     .tabs-vertical {
       display: flex;
       flex-direction: column;
@@ -413,17 +391,14 @@
       border-color: var(--tab-invite);
       color: var(--tab-invite);
     }
-
     .tabs-vertical .tab-icon {
       margin-right: 8px;
       font-size: 16px;
     }
-
     .content-area {
       flex: 1;
       min-width: 0;
     }
-
     .section {
       display: none;
       animation: fadeUp 220ms ease;
@@ -431,7 +406,6 @@
     .section.active {
       display: block;
     }
-
     @keyframes fadeUp {
       from {
         opacity: 0;
@@ -442,8 +416,6 @@
         transform: translateY(0);
       }
     }
-
-    /* ---------- responsive: vertical tabs become horizontal ---------- */
     @media (max-width: 820px) {
       .app-layout {
         flex-direction: column;
@@ -477,9 +449,7 @@
       }
       .tabs-vertical button .tab-label {
         display: none;
-        /* hidden by default on mobile */
       }
-      /* active tab shows label */
       .tabs-vertical button.active .tab-label {
         display: inline;
       }
@@ -522,7 +492,6 @@
         border-color: var(--tab-invite);
       }
     }
-
     @media (max-width: 480px) {
       .tabs-vertical button {
         padding: 4px 6px;
@@ -539,8 +508,7 @@
         padding: 4px 10px;
       }
     }
-
-    /* ---------- grid & panels ---------- */
+    /* rest of the grid & panel styles (same as before) */
     .grid-2 {
       display: grid;
       grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.7fr);
@@ -552,7 +520,6 @@
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 12px;
     }
-
     .panel {
       background: var(--panel);
       border: 1px solid var(--line);
@@ -578,7 +545,6 @@
     .panel-header h2 {
       margin-bottom: 0;
     }
-
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -587,7 +553,6 @@
     .form-grid .wide {
       grid-column: 1 / -1;
     }
-
     .chips {
       display: flex;
       flex-wrap: wrap;
@@ -630,7 +595,6 @@
     .chip input[type="number"]:focus {
       border-color: var(--teal);
     }
-
     .ratio-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -657,8 +621,6 @@
       text-align: center;
       font-size: 14px;
     }
-
-    /* Exact amount split */
     .exact-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -698,7 +660,6 @@
     .exact-total .remaining.zero {
       color: var(--teal-dark);
     }
-
     .toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -710,14 +671,12 @@
     .toolbar-start {
       justify-content: flex-start;
     }
-
     .row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       align-items: center;
     }
-
     .empty-state {
       color: var(--muted);
       border: 1px dashed var(--line);
@@ -732,13 +691,11 @@
       display: block;
       margin-bottom: 6px;
     }
-
     .list {
       display: grid;
       gap: 10px;
       margin-top: 10px;
     }
-
     .list-item {
       border: 1px solid var(--line);
       border-radius: var(--radius-sm);
@@ -784,7 +741,6 @@
       flex-wrap: wrap;
       margin-top: 6px;
     }
-
     .stat-card {
       background: var(--panel);
       border: 1px solid var(--line);
@@ -807,7 +763,6 @@
       font-weight: 720;
       letter-spacing: -0.01em;
     }
-
     .balance-table {
       width: 100%;
       border-collapse: collapse;
@@ -839,7 +794,6 @@
       color: var(--coral);
       font-weight: 700;
     }
-
     .cat-bar-row {
       display: grid;
       grid-template-columns: 100px minmax(0, 1fr) auto;
@@ -870,7 +824,6 @@
       text-align: right;
       font-size: 13px;
     }
-
     .settlement-item {
       border: 1px solid var(--line);
       border-radius: var(--radius-sm);
@@ -889,7 +842,6 @@
       color: var(--muted);
       margin: 0 4px;
     }
-
     .audit-item {
       border-bottom: 1px solid var(--line);
       padding: 8px 0;
@@ -907,7 +859,6 @@
       font-size: 11px;
       white-space: nowrap;
     }
-
     .notice {
       border: 1px solid var(--amber-light);
       background: #fffbeb;
@@ -923,7 +874,6 @@
       background: #f0f9ff;
       color: #0369a1;
     }
-
     dialog.modal {
       border: 0;
       border-radius: var(--radius);
@@ -945,7 +895,6 @@
     dialog.modal .modal-body h2 {
       margin-bottom: 8px;
     }
-
     .toast-container {
       position: fixed;
       bottom: 24px;
@@ -1004,12 +953,9 @@
         transform: translateY(0) scale(1);
       }
     }
-
     .hidden {
       display: none !important;
     }
-
-    /* ---------- mobile overrides ---------- */
     @media (max-width: 820px) {
       .app {
         padding: 12px 12px 24px;
@@ -1066,7 +1012,6 @@
         max-width: calc(100% - 24px);
       }
     }
-
     @media (max-width: 600px) {
       .app {
         padding: 10px 10px 20px;
@@ -1146,7 +1091,6 @@
         text-overflow: ellipsis;
       }
     }
-
     @media (max-width: 420px) {
       .grid-3 {
         grid-template-columns: 1fr;
@@ -1166,11 +1110,8 @@
     }
   </style>
 </head>
-
 <body>
-  <!-- ===== APP ===== -->
   <main class="app">
-    <!-- HEADER -->
     <header class="topbar">
       <div class="topbar-left">
         <h1>TripShare</h1>
@@ -1185,7 +1126,7 @@
       </div>
     </header>
 
-    <!-- TRIP NAME & SHORT SLUG & TRIP ID & NEW TRIP -->
+    <!-- TRIP NAME & SLUG & ID & NEW TRIP -->
     <div class="trip-name-row">
       <input id="tripName" aria-label="Trip name" maxlength="80" placeholder="Trip name…" />
       <span class="status-pill">🔗 <span id="shortSlugDisplay"></span></span>
@@ -1195,31 +1136,16 @@
 
     <!-- VERTICAL TABS + CONTENT -->
     <div class="app-layout">
-      <!-- TABS -->
       <nav class="tabs-vertical" aria-label="Sections">
-        <button class="tab active" data-tab="dashboard" type="button">
-          <span class="tab-icon">📊</span><span class="tab-label">Dashboard</span>
-        </button>
-        <button class="tab" data-tab="expenses" type="button">
-          <span class="tab-icon">🧾</span><span class="tab-label">Expenses</span>
-        </button>
-        <button class="tab" data-tab="people" type="button">
-          <span class="tab-icon">👤</span><span class="tab-label">People</span>
-        </button>
-        <button class="tab" data-tab="settle" type="button">
-          <span class="tab-icon">⚖️</span><span class="tab-label">Settle</span>
-        </button>
-        <button class="tab" data-tab="history" type="button">
-          <span class="tab-icon">📜</span><span class="tab-label">History</span>
-        </button>
-        <button class="tab" data-tab="invite" type="button">
-          <span class="tab-icon">🔗</span><span class="tab-label">Invite</span>
-        </button>
+        <button class="tab active" data-tab="dashboard" type="button"><span class="tab-icon">📊</span><span class="tab-label">Dashboard</span></button>
+        <button class="tab" data-tab="expenses" type="button"><span class="tab-icon">🧾</span><span class="tab-label">Expenses</span></button>
+        <button class="tab" data-tab="people" type="button"><span class="tab-icon">👤</span><span class="tab-label">People</span></button>
+        <button class="tab" data-tab="settle" type="button"><span class="tab-icon">⚖️</span><span class="tab-label">Settle</span></button>
+        <button class="tab" data-tab="history" type="button"><span class="tab-icon">📜</span><span class="tab-label">History</span></button>
+        <button class="tab" data-tab="invite" type="button"><span class="tab-icon">🔗</span><span class="tab-label">Invite</span></button>
       </nav>
-
-      <!-- CONTENT AREA -->
       <div class="content-area">
-        <!-- ===== DASHBOARD ===== -->
+        <!-- DASHBOARD -->
         <section id="dashboard" class="section active">
           <div class="grid-3" style="margin-bottom:16px;">
             <div class="stat-card"><span>Total spend</span><strong id="totalSpend">GBP 0.00</strong></div>
@@ -1241,8 +1167,7 @@
             </div>
           </div>
         </section>
-
-        <!-- ===== EXPENSES ===== -->
+        <!-- EXPENSES -->
         <section id="expenses" class="section">
           <div class="grid-2">
             <form id="expenseForm" class="panel">
@@ -1280,7 +1205,6 @@
                 <button class="btn-accent" type="submit">💾 Save expense</button>
               </div>
             </form>
-
             <div class="panel">
               <div class="panel-header">
                 <h2>Expenses <small id="expenseCountSmall">0</small></h2>
@@ -1290,8 +1214,7 @@
             </div>
           </div>
         </section>
-
-        <!-- ===== PEOPLE ===== -->
+        <!-- PEOPLE -->
         <section id="people" class="section">
           <div class="grid-2">
             <form id="personForm" class="panel">
@@ -1310,29 +1233,16 @@
             </div>
           </div>
         </section>
-
-        <!-- ===== SETTLE ===== -->
+        <!-- SETTLE -->
         <section id="settle" class="section">
           <div class="grid-2">
             <div class="panel">
               <h2>Record a payment (partial settlement)</h2>
               <form id="settlementForm" class="form-grid" style="grid-template-columns:1fr 1fr; gap:10px;">
-                <label>From
-                  <select id="settlementFrom" required>
-                    <option value="">—</option>
-                  </select>
-                </label>
-                <label>To
-                  <select id="settlementTo" required>
-                    <option value="">—</option>
-                  </select>
-                </label>
-                <label>Amount
-                  <input id="settlementAmount" type="number" step="0.01" min="0.01" required />
-                </label>
-                <label>Date
-                  <input id="settlementDate" type="date" required />
-                </label>
+                <label>From <select id="settlementFrom" required><option value="">—</option></select></label>
+                <label>To <select id="settlementTo" required><option value="">—</option></select></label>
+                <label>Amount <input id="settlementAmount" type="number" step="0.01" min="0.01" required /></label>
+                <label>Date <input id="settlementDate" type="date" required /></label>
                 <div class="wide" style="grid-column:1/-1; display:flex; gap:8px; justify-content:flex-end;">
                   <button type="submit" class="btn-accent">💸 Record payment</button>
                 </div>
@@ -1342,7 +1252,6 @@
                 <div id="manualSettlementsList" class="list"></div>
               </div>
             </div>
-
             <div class="panel">
               <h2>Suggested remaining settlements</h2>
               <div id="settlements" class="list"></div>
@@ -1354,31 +1263,26 @@
               <div class="row" style="margin-bottom:10px;">
                 <button id="exportJson" class="btn-ghost" type="button">⬇ Export JSON</button>
                 <label class="btn-ghost" style="border:1px solid var(--line); border-radius:var(--radius-sm); padding:8px 14px; min-height:44px; cursor:pointer; font-weight:550; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
-                  📤 Import JSON
-                  <input id="importJson" type="file" accept="application/json,.json" class="hidden" />
+                  📤 Import JSON <input id="importJson" type="file" accept="application/json,.json" class="hidden" />
                 </label>
               </div>
               <div class="notice notice-info">Import overwrites current trip data. Export includes full state.</div>
             </div>
           </div>
         </section>
-
-        <!-- ===== HISTORY ===== -->
+        <!-- HISTORY -->
         <section id="history" class="section">
           <div class="panel">
             <h2>Audit log</h2>
             <div id="auditLog" class="list"></div>
           </div>
         </section>
-
-        <!-- ===== INVITE ===== -->
+        <!-- INVITE -->
         <section id="invite" class="section">
           <div class="grid-2">
             <div class="panel">
               <h2>🔗 Invite links</h2>
-              <label>Full invite link
-                <input id="inviteLink" readonly />
-              </label>
+              <label>Full invite link <input id="inviteLink" readonly /></label>
               <div class="toolbar toolbar-start">
                 <button id="newTrip" class="btn-ghost btn-sm" type="button">🔄 New trip</button>
                 <button id="copyInvite2" class="btn-accent btn-sm" type="button">📋 Copy</button>
@@ -1390,16 +1294,12 @@
                   <button id="randomSlug" class="btn-ghost btn-sm" type="button">🎲 Random</button>
                 </div>
               </label>
-              <label style="margin-top:8px;">Short invite link
-                <input id="shortInviteLink" readonly />
-              </label>
+              <label style="margin-top:8px;">Short invite link <input id="shortInviteLink" readonly /></label>
               <div class="toolbar">
                 <button id="saveShortInvite" class="btn-accent" type="button">💾 Save short link</button>
                 <button id="copyShortInvite" class="btn-ghost" type="button">📋 Copy</button>
               </div>
-              <div class="notice notice-info" style="margin-top:16px;">
-                The short slug is stored in the cloud and makes your invite link memorable.
-              </div>
+              <div class="notice notice-info" style="margin-top:16px;">The short slug is stored in the cloud and makes your invite link memorable.</div>
             </div>
             <div class="panel">
               <h2>Sync status</h2>
@@ -1410,9 +1310,41 @@
         </section>
       </div>
     </div>
+
+    <!-- LANDING OVERLAY (shown when no trip loaded) -->
+    <div id="landingOverlay" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,0.92); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center; flex-direction:column; padding:20px; text-align:center;">
+      <div style="max-width:480px; background:white; border-radius:var(--radius); padding:40px; box-shadow:var(--shadow-lg);">
+        <h1 style="font-size:32px; margin-bottom:8px;">TripShare</h1>
+        <p style="color:var(--muted); margin-bottom:24px;">Start a new trip or join an existing one via invite link.</p>
+        <button id="landingNewTrip" class="btn-accent" style="font-size:18px; padding:14px 28px;">➕ Create New Trip</button>
+        <div style="margin-top:20px; border-top:1px solid var(--line); padding-top:20px;">
+          <p style="font-size:13px; color:var(--muted);">Already have an invite? Paste the short link or full URL in your browser.</p>
+          <input id="landingInviteInput" placeholder="e.g., #join/harbor" style="margin-top:8px; max-width:300px; display:inline-block; width:auto;" />
+          <button id="landingGoInvite" class="btn-ghost btn-sm" style="margin-top:6px;">Go</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL for new trip creation (short slug prompt) -->
+    <dialog id="createTripModal" class="modal">
+      <div class="modal-body">
+        <h2>Create a new trip</h2>
+        <p style="color:var(--muted); margin-bottom:16px;">Choose a memorable short name for your trip (e.g., "harbor"). This will be used in the invite link.</p>
+        <label>Short slug
+          <input id="createSlugInput" placeholder="e.g., summer2025" />
+        </label>
+        <div style="margin-top:8px; font-size:13px; color:var(--muted);">
+          Your link will be: <span id="createSlugPreview" style="font-weight:600; color:var(--ink);"></span>
+        </div>
+        <div class="toolbar" style="margin-top:16px;">
+          <button id="cancelCreateTrip" class="btn-ghost" type="button">Cancel</button>
+          <button id="confirmCreateTrip" class="btn-accent" type="button">✅ Create Trip</button>
+        </div>
+      </div>
+    </dialog>
   </main>
 
-  <!-- ===== MODAL ===== -->
+  <!-- ===== MODAL FOR REMOVE PARTICIPANT ===== -->
   <dialog id="removeDialog" class="modal">
     <div class="modal-body">
       <h2 id="removeTitle">Remove participant</h2>
@@ -1430,7 +1362,7 @@
   <!-- ===== SCRIPT ===== -->
   <script type="module">
     /* ============================================================
-       TripShare v2 – final (mobile tabs fixed, pill style unified)
+       TripShare v2 – New trip creation only on explicit user action
        ============================================================ */
     const APP_SUPABASE_URL = "https://cusegeussklgueqpwkbz.supabase.co";
     const APP_SUPABASE_ANON_KEY =
@@ -1464,6 +1396,7 @@
     let applyingRemote = false;
     let saveTimer = null;
     let isEditingExpense = false;
+    let isTripLoaded = false; // flag to know if we have a real trip
 
     const $ = (id) => document.getElementById(id);
     const toastContainer = $("toastContainer");
@@ -1477,16 +1410,16 @@
       if (joinSlug) return "pending-" + joinSlug;
       const fromHash = location.hash.replace(/^#\/?trip\//, "").replace(/^#/, "").trim();
       if (fromHash) return fromHash;
-      const gen = "trip-" + Math.random().toString(36).slice(2, 8);
-      history.replaceState(null, "", "#trip/" + gen);
-      return gen;
+      // No valid hash – return null (will show landing page)
+      return null;
     }
 
     function storageKey() {
-      return "tripshare:v2:" + tripId;
+      return "tripshare:v2:" + (tripId || "none");
     }
 
     function loadState() {
+      if (!tripId) return null;
       try {
         const raw = localStorage.getItem(storageKey());
         if (raw) {
@@ -1494,10 +1427,7 @@
           return migrateDefaultLabels(parsed);
         }
       } catch (_) {}
-      const s = clone(defaultState);
-      if (!s.shortSlug) s.shortSlug = generateUniqueSlugSync();
-      s.audit.push(auditEvent("Trip created"));
-      return s;
+      return null;
     }
 
     function normalizeState(v) {
@@ -1517,16 +1447,6 @@
       if (!v.people || v.people.length === 0) {
         v.people = clone(defaultState.people);
       }
-      const isSeed =
-        v.tripName === "<Trip Name>" &&
-        v.people.join("|") === "Person1|Person2" &&
-        v.expenses.length === 0;
-      if (isSeed) {
-        v.tripName = defaultState.tripName;
-        v.people = clone(defaultState.people);
-        v.shortSlug = generateUniqueSlugSync();
-      }
-      if (!v.shortSlug) v.shortSlug = generateUniqueSlugSync();
       if (!v.settlements) v.settlements = [];
       if (!v.nextSettlementId) v.nextSettlementId = 1;
       return v;
@@ -1568,10 +1488,6 @@
       return easyWords[Math.floor(Math.random() * easyWords.length)];
     }
 
-    function generateUniqueSlugSync() {
-      return generateRandomSlug();
-    }
-
     async function checkSlugUniqueness(slug) {
       if (!supabase) return true;
       const { data, error } = await supabase
@@ -1595,13 +1511,15 @@
       }
     }
 
+    // ---------- snapshot / undo ----------
     function snapshot() {
+      if (!state) return;
       lastSnapshot = JSON.stringify(state);
       $("undoBtn").disabled = false;
     }
 
     function restoreSnapshot() {
-      if (!lastSnapshot) return;
+      if (!lastSnapshot || !state) return;
       state = normalizeState(JSON.parse(lastSnapshot));
       lastSnapshot = null;
       state.audit.unshift(auditEvent("Undid last action"));
@@ -1610,20 +1528,22 @@
       toast("Undo successful", "success");
     }
 
+    // ---------- save & render ----------
     function saveAndRender() {
+      if (!state || !tripId) return;
       localStorage.setItem(storageKey(), JSON.stringify(state));
       render();
       scheduleCloudSave();
     }
 
     function scheduleCloudSave() {
-      if (!supabase || applyingRemote) return;
+      if (!supabase || applyingRemote || !state || !tripId) return;
       clearTimeout(saveTimer);
       saveTimer = setTimeout(saveToCloud, 450);
     }
 
     async function saveToCloud() {
-      if (!supabase) return;
+      if (!supabase || !state || !tripId) return;
       const payload = {
         id: tripId,
         trip_name: state.tripName,
@@ -1634,7 +1554,13 @@
       if (error) setSyncStatus("Local", false, error.message);
     }
 
+    // ---------- render ----------
     function render() {
+      if (!state || !tripId) {
+        showLanding(true);
+        return;
+      }
+      showLanding(false);
       $("tripIdLabel").textContent = tripId;
       $("tripName").value = state.tripName;
       $("shortSlugDisplay").textContent = state.shortSlug || "—";
@@ -1654,7 +1580,18 @@
       populateSettlementSelects();
     }
 
+    function showLanding(show) {
+      const overlay = $("landingOverlay");
+      overlay.style.display = show ? "flex" : "none";
+      // also hide main content if landing is shown
+      const mainContent = document.querySelector(".app-layout");
+      if (mainContent) mainContent.style.display = show ? "none" : "flex";
+      const tripRow = document.querySelector(".trip-name-row");
+      if (tripRow) tripRow.style.display = show ? "none" : "flex";
+    }
+
     function populateSettlementSelects() {
+      if (!state) return;
       const opts = state.people.map(n => `<option value="${escapeAttr(n)}">${escapeHtml(n)}</option>`).join("");
       const fromSel = $("settlementFrom");
       const toSel = $("settlementTo");
@@ -1676,6 +1613,7 @@
 
     // -- people --
     function renderParticipants() {
+      if (!state) return;
       const count = state.people.length;
       $("personCount").textContent = count;
       $("personCountSmall").textContent = count;
@@ -1704,6 +1642,7 @@
 
     // -- expense form --
     function renderExpenseFormPeople() {
+      if (!state) return;
       const paidBy = $("paidBy");
       paidBy.innerHTML = state.people.map(n => `<option>${escapeHtml(n)}</option>`).join("");
       const chips = $("shareChips");
@@ -1737,6 +1676,7 @@
     }
 
     function renderRatioInputs() {
+      if (!state) return;
       const isRatio = $("splitType").value === "ratio";
       const wrap = $("ratioWeights");
       wrap.classList.toggle("hidden", !isRatio);
@@ -1750,6 +1690,7 @@
     }
 
     function renderExactInputs() {
+      if (!state) return;
       const isExact = $("splitType").value === "exact";
       const wrap = $("exactAmounts");
       const totalWrap = $("exactTotal");
@@ -1848,6 +1789,7 @@
 
     // -- expenses --
     function renderExpenses() {
+      if (!state) return;
       const count = state.expenses.length;
       $("expenseCount").textContent = count;
       $("expenseCountSmall").textContent = count;
@@ -1892,6 +1834,7 @@
 
     // -- dashboard --
     function renderDashboard() {
+      if (!state) return;
       const total = sum(state.expenses.map(e => e.amount));
       $("totalSpend").textContent = currency.format(total);
       const balances = calculateBalances();
@@ -1942,7 +1885,7 @@
           </div>
         `).join("");
       }
-      // ---- Settlement preview on dashboard ----
+      // ---- Settlement preview ----
       const settlements = calculateSettlements();
       const previewWrap = $("settlementPreview");
       if (!settlements.length) {
@@ -1961,6 +1904,7 @@
 
     // -- settlements --
     function renderManualSettlements() {
+      if (!state) return;
       const wrap = $("manualSettlementsList");
       if (!state.settlements.length) {
         wrap.innerHTML = `<div class="empty-state"><span class="icon">💸</span>No manual settlements recorded.</div>`;
@@ -1985,6 +1929,7 @@
     }
 
     function renderSettlements() {
+      if (!state) return;
       const settlements = calculateSettlements();
       const wrap = $("settlements");
       if (!settlements.length) {
@@ -2001,6 +1946,7 @@
 
     // -- audit --
     function renderAudit() {
+      if (!state) return;
       const wrap = $("auditLog");
       if (!state.audit.length) {
         wrap.innerHTML = `<div class="empty-state"><span class="icon">📜</span>No activity yet.</div>`;
@@ -2016,6 +1962,7 @@
 
     // ---------- calculations ----------
     function calculateBalances() {
+      if (!state) return {};
       const b = Object.fromEntries(state.people.map(n => [n, { paid: 0, owes: 0, net: 0 }]));
       for (const exp of state.expenses) {
         if (b[exp.paidBy]) b[exp.paidBy].paid += exp.amount;
@@ -2062,6 +2009,7 @@
     // ---------- CRUD ----------
     function addOrUpdateExpense(event) {
       event.preventDefault();
+      if (!state) return;
       if (!state.people.length) { toast("Add at least one participant first.", "error"); return; }
       let split;
       try { split = splitShares(); } catch (err) { toast(err.message, "error"); return; }
@@ -2096,6 +2044,7 @@
     }
 
     function editExpense(id) {
+      if (!state) return;
       const exp = state.expenses.find(e => e.id === id);
       if (!exp) return;
       isEditingExpense = true;
@@ -2132,6 +2081,7 @@
     }
 
     function deleteExpense(id) {
+      if (!state) return;
       const exp = state.expenses.find(e => e.id === id);
       if (!exp) return;
       if (!confirm(`Delete "${exp.description}"?`)) return;
@@ -2154,6 +2104,7 @@
 
     function addPerson(event) {
       event.preventDefault();
+      if (!state) return;
       const name = $("personName").value.trim();
       if (!name) return;
       if (state.people.some(p => p.toLowerCase() === name.toLowerCase())) {
@@ -2169,6 +2120,7 @@
     }
 
     function openRemoveDialog(name) {
+      if (!state) return;
       const remaining = state.people.filter(p => p !== name);
       if (!remaining.length) { toast("Cannot remove the last participant.", "error"); return; }
       pendingRemoveName = name;
@@ -2187,7 +2139,7 @@
 
     function removeParticipant() {
       const name = pendingRemoveName;
-      if (!name) return;
+      if (!name || !state) return;
       snapshot();
       const updated = [];
       for (const exp of state.expenses) {
@@ -2230,6 +2182,7 @@
 
     function addSettlement(event) {
       event.preventDefault();
+      if (!state) return;
       const from = $("settlementFrom").value;
       const to = $("settlementTo").value;
       const amount = roundMoney(Number($("settlementAmount").value));
@@ -2247,6 +2200,7 @@
     }
 
     function deleteSettlement(id) {
+      if (!state) return;
       const s = state.settlements.find(item => item.id === id);
       if (!s) return;
       if (!confirm(`Delete settlement ${s.from} → ${s.to} ${currency.format(s.amount)}?`)) return;
@@ -2255,6 +2209,76 @@
       state.audit.unshift(auditEvent(`Deleted settlement: ${s.from} → ${s.to}`));
       saveAndRender();
       toast("Settlement deleted", "success");
+    }
+
+    // ---------- NEW TRIP CREATION (with prompt) ----------
+    async function initiateNewTrip() {
+      // show modal with default slug suggestion
+      const modal = $("createTripModal");
+      const input = $("createSlugInput");
+      const preview = $("createSlugPreview");
+      let suggested = generateRandomSlug();
+      // ensure it's not already taken (as best as we can)
+      if (supabase) {
+        const available = await checkSlugUniqueness(suggested);
+        if (!available) {
+          suggested = await suggestAlternativeSlug(suggested);
+        }
+      }
+      input.value = suggested;
+      preview.textContent = `#join/${suggested}`;
+      modal.showModal();
+    }
+
+    async function confirmCreateTrip() {
+      const modal = $("createTripModal");
+      const input = $("createSlugInput");
+      let slug = input.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-");
+      if (!slug) {
+        toast("Please enter a short slug.", "error");
+        return;
+      }
+      // check uniqueness
+      if (supabase) {
+        const available = await checkSlugUniqueness(slug);
+        if (!available) {
+          const alt = await suggestAlternativeSlug(slug);
+          if (alt !== slug) {
+            const useAlt = confirm(`"${slug}" is already taken. Use "${alt}" instead?`);
+            if (useAlt) {
+              slug = alt;
+              input.value = alt;
+            } else {
+              toast("Please choose another slug.", "error");
+              return;
+            }
+          }
+        }
+      }
+      // create new trip ID
+      const newId = "trip-" + Math.random().toString(36).slice(2, 8);
+      tripId = newId;
+      // initialise state
+      state = clone(defaultState);
+      state.shortSlug = slug;
+      state.audit = [auditEvent("Trip created")];
+      // save to localStorage and cloud
+      saveAndRender();
+      if (supabase) {
+        try {
+          await saveShortSlugToDB(slug);
+          await saveToCloud();
+        } catch (err) {
+          toast(err.message, "error");
+        }
+      }
+      // update URL
+      history.replaceState(null, "", "#join/" + slug);
+      // close modal and show main content
+      modal.close();
+      isTripLoaded = true;
+      render();
+      toast("Trip created successfully!", "success");
     }
 
     // ---------- sync ----------
@@ -2266,9 +2290,22 @@
         const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm");
         supabase = createClient(url, key);
         setSyncStatus("Connecting…", false);
+        // If we have a join slug, resolve it
         if (joinSlug) {
-          try { await resolveShortInvite(joinSlug); } catch (e) { toast(e.message, "error"); }
+          try {
+            await resolveShortInvite(joinSlug);
+          } catch (e) {
+            toast(e.message, "error");
+            // if resolution fails, we stay with null tripId -> landing page
+          }
         }
+        // If tripId is null after resolution, show landing
+        if (!tripId) {
+          showLanding(true);
+          setSyncStatus("Local", false);
+          return;
+        }
+        // Otherwise fetch remote state
         const { data, error } = await supabase
           .from("trip_documents")
           .select("payload")
@@ -2279,29 +2316,39 @@
           applyingRemote = true;
           const remoteState = normalizeState(data.payload);
           if (!remoteState.people || remoteState.people.length === 0) {
-            remoteState.people = state.people.length > 0 ? state.people : clone(defaultState.people);
+            remoteState.people = clone(defaultState.people);
           }
           state = remoteState;
-          if (!state.shortSlug) {
-            const newSlug = await suggestAlternativeSlug(generateRandomSlug());
-            state.shortSlug = newSlug;
+          // ensure shortSlug matches the resolved slug if any
+          if (joinSlug && state.shortSlug !== joinSlug) {
+            state.shortSlug = joinSlug;
           }
           localStorage.setItem(storageKey(), JSON.stringify(state));
           applyingRemote = false;
+          isTripLoaded = true;
         } else {
-          if (!state.shortSlug) {
-            const newSlug = await suggestAlternativeSlug(generateRandomSlug());
-            state.shortSlug = newSlug;
+          // No remote state – this could be a new trip that hasn't been saved yet
+          // If we have a tripId but no remote state, we might have a local state
+          if (state && tripId) {
+            // if we have local state, we can keep it (but we should save it eventually)
+            isTripLoaded = true;
+          } else {
+            // no state, show landing
+            showLanding(true);
+            setSyncStatus("Local", false);
+            return;
           }
-          await saveToCloud();
         }
-        await saveShortSlugToDB(state.shortSlug);
+        // ensure short slug is saved in short_links
+        if (state && state.shortSlug) {
+          await saveShortSlugToDB(state.shortSlug);
+        }
         await subscribeToTrip();
         setSyncStatus("Live sync", true);
-        if (state.shortSlug && !location.hash.includes("join")) {
+        if (state && state.shortSlug && !location.hash.includes("join")) {
           history.replaceState(null, "", "#join/" + state.shortSlug);
         }
-        render();
+        if (state) render();
         toast("Connected to cloud", "success");
       } catch (err) {
         supabase = null;
@@ -2322,11 +2369,13 @@
       tripId = data.trip_id;
       joinSlug = "";
       history.replaceState(null, "", "#join/" + slug);
-      state = loadState();
+      // reload state from localStorage (if any)
+      const loaded = loadState();
+      if (loaded) state = loaded;
     }
 
     async function saveShortSlugToDB(slug) {
-      if (!supabase) return;
+      if (!supabase || !tripId) return;
       const { error } = await supabase.from("short_links").upsert({
         slug,
         trip_id: tripId,
@@ -2337,6 +2386,7 @@
     }
 
     async function subscribeToTrip() {
+      if (!supabase || !tripId) return;
       if (subscription) await subscription.unsubscribe();
       subscription = supabase
         .channel("trip_documents:" + tripId)
@@ -2370,10 +2420,12 @@
     function buildInviteLink() {
       const url = new URL(location.href);
       url.search = "";
-      if (state.shortSlug) {
+      if (state && state.shortSlug) {
         url.hash = "#join/" + state.shortSlug;
-      } else {
+      } else if (tripId) {
         url.hash = "#trip/" + tripId;
+      } else {
+        url.hash = "";
       }
       return url.toString();
     }
@@ -2405,7 +2457,7 @@
     }
 
     function copyShortInvite() {
-      const slug = normalizeSlug($("shortSlug").value) || state.shortSlug;
+      const slug = normalizeSlug($("shortSlug").value) || (state ? state.shortSlug : "");
       const link = buildShortInviteLink(slug);
       if (!link) { toast("Generate a short name first.", "error"); return; }
       navigator.clipboard.writeText(link).then(() => toast("Short invite copied", "success"));
@@ -2413,6 +2465,7 @@
 
     async function saveShortInvite() {
       if (!supabase) { toast("Cloud not connected. Please wait for auto-connect.", "error"); return; }
+      if (!state) { toast("No trip loaded.", "error"); return; }
       let slug = normalizeSlug($("shortSlug").value);
       if (!slug) slug = randomEasySlug();
       $("shortSlug").value = slug;
@@ -2448,26 +2501,13 @@
     }
 
     function newTripId() {
-      if (!confirm("Create a new empty trip ID? Current trip data stays saved under the old link.")) return;
-      tripId = "trip-" + Math.random().toString(36).slice(2, 8);
-      const newSlug = generateUniqueSlugSync();
-      state = loadState();
-      state.shortSlug = newSlug;
-      state.audit = [auditEvent("New trip created")];
-      state.people = clone(defaultState.people);
-      state.expenses = [];
-      state.settlements = [];
-      state.nextExpenseId = 1;
-      state.nextSettlementId = 1;
-      lastSnapshot = null;
-      history.replaceState(null, "", "#join/" + newSlug);
-      saveAndRender();
-      if (supabase) { saveShortSlugToDB(newSlug).catch(() => {}); }
-      toast("New trip created", "success");
+      // now this is just a wrapper that shows the modal
+      initiateNewTrip();
     }
 
     // ---------- export / import ----------
     function exportCsv() {
+      if (!state) return;
       const rows = [
         ["Date", "Description", "Category", "Amount", "Paid By", "Split Type", "Shared By"]
       ];
@@ -2484,12 +2524,14 @@
     }
 
     function exportJson() {
+      if (!state) return;
       const data = { tripId, ...state };
       download("tripshare-state.json", JSON.stringify(data, null, 2), "application/json");
       toast("JSON exported", "success");
     }
 
     function importJson(event) {
+      if (!state) return;
       const file = event.target.files?.[0];
       if (!file) return;
       const reader = new FileReader();
@@ -2520,6 +2562,7 @@
     }
 
     function copySettlements() {
+      if (!state) return;
       const settlements = calculateSettlements();
       const text = settlements.length ?
         settlements.map(s => `${s.from} pays ${currency.format(s.amount)} to ${s.to}`).join("\n") :
@@ -2537,6 +2580,7 @@
 
     $("expenseAmount").addEventListener("input", updateExactTotal);
     $("tripName").addEventListener("change", () => {
+      if (!state) return;
       snapshot();
       state.tripName = $("tripName").value.trim() || "My Trip";
       state.audit.unshift(auditEvent("Renamed trip"));
@@ -2574,12 +2618,48 @@
     $("importJson").addEventListener("change", importJson);
     $("newTrip").addEventListener("click", newTripId);
 
+    // Landing page buttons
+    $("landingNewTrip").addEventListener("click", initiateNewTrip);
+    $("landingGoInvite").addEventListener("click", () => {
+      const input = $("landingInviteInput").value.trim();
+      if (input.startsWith("#join/")) {
+        location.hash = input;
+        location.reload();
+      } else if (input) {
+        location.hash = "#join/" + input;
+        location.reload();
+      }
+    });
+
+    // Create trip modal
+    $("cancelCreateTrip").addEventListener("click", () => $("createTripModal").close());
+    $("confirmCreateTrip").addEventListener("click", confirmCreateTrip);
+    $("createSlugInput").addEventListener("input", () => {
+      const val = normalizeSlug($("createSlugInput").value);
+      $("createSlugInput").value = val;
+      $("createSlugPreview").textContent = val ? "#join/" + val : "";
+    });
+
     // ---------- init ----------
-    if (state.shortSlug && !location.hash.includes("join")) {
-      history.replaceState(null, "", "#join/" + state.shortSlug);
+    // If tripId is null, show landing (already done in render)
+    // Otherwise, try to load state
+    if (tripId) {
+      const loaded = loadState();
+      if (loaded) state = loaded;
+      // if we have a state, render and connect
+      if (state) {
+        isTripLoaded = true;
+        render();
+      } else {
+        showLanding(true);
+      }
+    } else {
+      showLanding(true);
     }
-    render();
+
+    // auto-connect regardless – if we have a trip, it will fetch remote data
     autoConnectSupabase();
+
     window.__tripshare = { state, tripId, supabase };
   </script>
 </body>
