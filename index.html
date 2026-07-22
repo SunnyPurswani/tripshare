@@ -5,15 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes" />
   <title>TripShare v2 — shared trip expenses</title>
   <style>
-    /* ---------- all styles (same as before, keep untouched) ---------- */
-    /* ... (paste your existing CSS here) ... */
-    /* But I'll include them below for completeness */
+    /* ---------- reset & tokens ---------- */
     *,
     *::before,
     *::after {
       box-sizing: border-box;
       margin: 0;
     }
+
     :root {
       --teal: #0f766e;
       --teal-dark: #115e59;
@@ -44,6 +43,7 @@
       --tab-history: #dc2626;
       --tab-invite: #059669;
     }
+
     html {
       font-family: var(--font);
       color: var(--ink);
@@ -51,6 +51,7 @@
       -webkit-font-smoothing: antialiased;
       -webkit-tap-highlight-color: transparent;
     }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -508,7 +509,7 @@
         padding: 4px 10px;
       }
     }
-    /* rest of the grid & panel styles (same as before) */
+    /* rest of the grid & panel styles */
     .grid-2 {
       display: grid;
       grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.7fr);
@@ -1362,7 +1363,7 @@
   <!-- ===== SCRIPT ===== -->
   <script type="module">
     /* ============================================================
-       TripShare v2 – New trip creation only on explicit user action
+       TripShare v2 – Final version with foreign key fix
        ============================================================ */
     const APP_SUPABASE_URL = "https://cusegeussklgueqpwkbz.supabase.co";
     const APP_SUPABASE_ANON_KEY =
@@ -1396,7 +1397,7 @@
     let applyingRemote = false;
     let saveTimer = null;
     let isEditingExpense = false;
-    let isTripLoaded = false; // flag to know if we have a real trip
+    let isTripLoaded = false;
 
     const $ = (id) => document.getElementById(id);
     const toastContainer = $("toastContainer");
@@ -1410,7 +1411,6 @@
       if (joinSlug) return "pending-" + joinSlug;
       const fromHash = location.hash.replace(/^#\/?trip\//, "").replace(/^#/, "").trim();
       if (fromHash) return fromHash;
-      // No valid hash – return null (will show landing page)
       return null;
     }
 
@@ -1511,7 +1511,6 @@
       }
     }
 
-    // ---------- snapshot / undo ----------
     function snapshot() {
       if (!state) return;
       lastSnapshot = JSON.stringify(state);
@@ -1528,7 +1527,6 @@
       toast("Undo successful", "success");
     }
 
-    // ---------- save & render ----------
     function saveAndRender() {
       if (!state || !tripId) return;
       localStorage.setItem(storageKey(), JSON.stringify(state));
@@ -1554,7 +1552,6 @@
       if (error) setSyncStatus("Local", false, error.message);
     }
 
-    // ---------- render ----------
     function render() {
       if (!state || !tripId) {
         showLanding(true);
@@ -1583,7 +1580,6 @@
     function showLanding(show) {
       const overlay = $("landingOverlay");
       overlay.style.display = show ? "flex" : "none";
-      // also hide main content if landing is shown
       const mainContent = document.querySelector(".app-layout");
       if (mainContent) mainContent.style.display = show ? "none" : "flex";
       const tripRow = document.querySelector(".trip-name-row");
@@ -2211,14 +2207,12 @@
       toast("Settlement deleted", "success");
     }
 
-    // ---------- NEW TRIP CREATION (with prompt) ----------
+    // ---------- NEW TRIP CREATION (with foreign key fix) ----------
     async function initiateNewTrip() {
-      // show modal with default slug suggestion
       const modal = $("createTripModal");
       const input = $("createSlugInput");
       const preview = $("createSlugPreview");
       let suggested = generateRandomSlug();
-      // ensure it's not already taken (as best as we can)
       if (supabase) {
         const available = await checkSlugUniqueness(suggested);
         if (!available) {
@@ -2238,7 +2232,6 @@
         toast("Please enter a short slug.", "error");
         return;
       }
-      // check uniqueness
       if (supabase) {
         const available = await checkSlugUniqueness(slug);
         if (!available) {
@@ -2255,30 +2248,46 @@
           }
         }
       }
-      // create new trip ID
       const newId = "trip-" + Math.random().toString(36).slice(2, 8);
       tripId = newId;
-      // initialise state
       state = clone(defaultState);
       state.shortSlug = slug;
       state.audit = [auditEvent("Trip created")];
-      // save to localStorage and cloud
-      saveAndRender();
+
+      // Save locally first (for immediate UI)
+      localStorage.setItem(storageKey(), JSON.stringify(state));
+      render(); // show empty trip
+
+      // Now save to cloud in correct order: trip document first, then short link
       if (supabase) {
         try {
-          await saveShortSlugToDB(slug);
-          await saveToCloud();
+          await saveToCloud(); // trip document
+          await saveShortSlugToDB(slug); // short link (now trip exists)
+          toast("Trip created successfully!", "success");
         } catch (err) {
-          toast(err.message, "error");
+          toast("Error creating trip: " + err.message, "error");
+          // Optionally rollback local state? But user can retry.
+          return;
         }
+      } else {
+        toast("Trip created locally (no cloud sync).", "info");
       }
-      // update URL
+
       history.replaceState(null, "", "#join/" + slug);
-      // close modal and show main content
       modal.close();
       isTripLoaded = true;
-      render();
-      toast("Trip created successfully!", "success");
+      render(); // re‑render to update URL and sync status
+    }
+
+    async function saveShortSlugToDB(slug) {
+      if (!supabase || !tripId) return;
+      const { error } = await supabase.from("short_links").upsert({
+        slug,
+        trip_id: tripId,
+        full_url: buildInviteLink(),
+        updated_at: new Date().toISOString(),
+      });
+      if (error) throw error;
     }
 
     // ---------- sync ----------
@@ -2290,22 +2299,18 @@
         const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm");
         supabase = createClient(url, key);
         setSyncStatus("Connecting…", false);
-        // If we have a join slug, resolve it
         if (joinSlug) {
           try {
             await resolveShortInvite(joinSlug);
           } catch (e) {
             toast(e.message, "error");
-            // if resolution fails, we stay with null tripId -> landing page
           }
         }
-        // If tripId is null after resolution, show landing
         if (!tripId) {
           showLanding(true);
           setSyncStatus("Local", false);
           return;
         }
-        // Otherwise fetch remote state
         const { data, error } = await supabase
           .from("trip_documents")
           .select("payload")
@@ -2319,7 +2324,6 @@
             remoteState.people = clone(defaultState.people);
           }
           state = remoteState;
-          // ensure shortSlug matches the resolved slug if any
           if (joinSlug && state.shortSlug !== joinSlug) {
             state.shortSlug = joinSlug;
           }
@@ -2327,19 +2331,15 @@
           applyingRemote = false;
           isTripLoaded = true;
         } else {
-          // No remote state – this could be a new trip that hasn't been saved yet
-          // If we have a tripId but no remote state, we might have a local state
+          // No remote state – if we have local state, keep it; else show landing
           if (state && tripId) {
-            // if we have local state, we can keep it (but we should save it eventually)
             isTripLoaded = true;
           } else {
-            // no state, show landing
             showLanding(true);
             setSyncStatus("Local", false);
             return;
           }
         }
-        // ensure short slug is saved in short_links
         if (state && state.shortSlug) {
           await saveShortSlugToDB(state.shortSlug);
         }
@@ -2369,20 +2369,8 @@
       tripId = data.trip_id;
       joinSlug = "";
       history.replaceState(null, "", "#join/" + slug);
-      // reload state from localStorage (if any)
       const loaded = loadState();
       if (loaded) state = loaded;
-    }
-
-    async function saveShortSlugToDB(slug) {
-      if (!supabase || !tripId) return;
-      const { error } = await supabase.from("short_links").upsert({
-        slug,
-        trip_id: tripId,
-        full_url: buildInviteLink(),
-        updated_at: new Date().toISOString(),
-      });
-      if (error) throw error;
     }
 
     async function subscribeToTrip() {
@@ -2501,7 +2489,6 @@
     }
 
     function newTripId() {
-      // now this is just a wrapper that shows the modal
       initiateNewTrip();
     }
 
@@ -2641,12 +2628,9 @@
     });
 
     // ---------- init ----------
-    // If tripId is null, show landing (already done in render)
-    // Otherwise, try to load state
     if (tripId) {
       const loaded = loadState();
       if (loaded) state = loaded;
-      // if we have a state, render and connect
       if (state) {
         isTripLoaded = true;
         render();
@@ -2657,7 +2641,6 @@
       showLanding(true);
     }
 
-    // auto-connect regardless – if we have a trip, it will fetch remote data
     autoConnectSupabase();
 
     window.__tripshare = { state, tripId, supabase };
