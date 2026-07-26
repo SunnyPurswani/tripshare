@@ -1372,7 +1372,7 @@
       const url = APP_SUPABASE_URL, key = APP_SUPABASE_ANON_KEY;
       if (!url || !key) { setSyncStatus("Local", false, "No credentials"); return; }
       try {
-        const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+        const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
         supabase = createClient(url, key);
         setSyncStatus("Connecting…", false);
         if (joinSlug) {
