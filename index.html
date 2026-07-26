@@ -30,6 +30,7 @@
       --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
       --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
       --cat-food: #f59e0b; --cat-drinks: #ef4444; --cat-hotel: #8b5cf6; --cat-fuel: #10b981;
+
       --cat-activities: #3b82f6; --cat-shopping: #ec4899; --cat-transport: #06b6d4; --cat-other: #64748b;
     }
     [data-theme="dark"] {
@@ -1442,18 +1443,19 @@
     }
 
     // ---------- Invite Links ----------
+    const TINY_BASE = "https://tinyurl.com/trpshr";
     function buildInviteLink() {
-      const url = new URL(location.pathname, location.origin);
-      if (state && state.shortSlug) url.hash = "#join/" + state.shortSlug;
-      else if (tripId) url.hash = "#trip/" + tripId;
-      return url.toString();
+      if (state && state.shortSlug) {
+        return TINY_BASE + "/#join/" + state.shortSlug;
+      } else if (tripId) {
+        return TINY_BASE + "/#trip/" + tripId;
+      }
+      return TINY_BASE;
     }
     function buildShortInviteLink(slug) {
       const clean = normalizeSlug(slug);
       if (!clean) return "";
-      const url = new URL(location.pathname, location.origin);
-      url.hash = "#join/" + clean;
-      return url.toString();
+      return TINY_BASE + "/#join/" + clean;
     }
     function normalizeSlug(v) {
       return String(v || "").trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 32);
