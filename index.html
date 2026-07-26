@@ -649,7 +649,7 @@
     function sum(arr) { return arr.reduce((a, b) => a + Number(b || 0), 0); }
     function roundMoney(v) { return Math.round((Number(v) + Number.EPSILON) * 100) / 100; }
     function escapeHtml(s) {
-      return String(s ?? "").replace(/[&<>"']/g, (ch) => ({"&":"&amp;","<":"&lt;",">":"&gt;",""":"&quot;","'":"&#039;"}[ch]));
+      return String(s ?? "").replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[ch]));
     }
     function escapeAttr(s) { return escapeHtml(s).replace(/`/g, "&#096;"); }
     function cssEscape(s) { return window.CSS?.escape ? CSS.escape(s) : String(s).replace(/["\\]/g, "\\$&"); }
