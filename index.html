@@ -187,7 +187,6 @@
     .exact-total { font-size: 13px; color: var(--text-muted); margin-top: 8px; text-align: right; font-weight: 500; }
     .exact-total .remaining { font-weight: 700; color: var(--coral); }
     .exact-total .remaining.zero { color: var(--emerald); }
-    /* Refund section */
     .refund-section {
       background: var(--bg-subtle); border: 1.5px dashed var(--border); border-radius: var(--radius-sm);
       padding: 14px; margin-top: 6px; transition: all var(--transition-fast);
@@ -452,7 +451,6 @@
                   <div id="exactAmounts" class="exact-grid hidden"></div>
                   <div id="exactTotal" class="exact-total hidden"></div>
                 </div>
-                <!-- Refund Section -->
                 <div class="wide">
                   <label class="label-normal" style="display:flex; align-items:center; gap:10px; text-transform:none; font-weight:600; cursor:pointer;">
                     <input type="checkbox" id="hasRefund" /> 💰 This expense includes a refund/correction
@@ -604,7 +602,7 @@
 
   <script type="module">
     /* ============================================================
-       TripShare v3 — with Refund/Correction feature
+       TripShare v3 — Complete with Refund/Correction & CSV Split Details
        ============================================================ */
     const APP_SUPABASE_URL = "https://cusegeussklgueqpwkbz.supabase.co";
     const APP_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1c2VnZXVzc2tsZ3VlcXB3a2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTc1MDksImV4cCI6MjA5NzQ3MzUwOX0.HOO_Ko5Rk9fKDVXEwGDZye5JupcvIwewH50tN19JRXE";
@@ -913,7 +911,6 @@
           }
         }
       } else {
-        // reset refund fields for new expense
         hasRefund.checked = false;
         refundAmount.value = '';
         refundReason.value = '';
@@ -922,12 +919,11 @@
         refundNetInfo.classList.add('hidden');
       }
 
-      // Event listeners for refund
+      // Event listeners
       hasRefund.addEventListener('change', () => {
         if (hasRefund.checked) {
           refundSection.classList.remove('hidden');
           refundSection.classList.add('visible');
-          // Pre-fill refund amount with expense amount if empty
           if (!refundAmount.value) {
             refundAmount.value = Number($("expenseAmount").value) || 0;
           }
@@ -949,7 +945,6 @@
         if (hasRefund.checked) {
           updateRefundNetInfo(Number($("expenseAmount").value), Number(refundAmount.value));
         }
-        // Also update exact total
         updateExactTotal();
       });
     }
@@ -963,9 +958,6 @@
         refundOriginalDisplay.textContent = fmtMoney(original);
         refundNetDisplay.textContent = fmtMoney(net);
         refundNetInfo.classList.remove('hidden');
-        if (refund > 0) {
-          refundNetInfo.style.color = 'var(--text-soft)';
-        }
       } else {
         refundNetInfo.classList.add('hidden');
       }
@@ -1046,10 +1038,6 @@
       return [...document.querySelectorAll('input[name="sharedBy"]:checked')].map(i => i.value);
     }
 
-    function getExpenseNetAmount(expense) {
-      return roundMoney((Number(expense.amount) || 0) - (Number(expense.refundAmount) || 0));
-    }
-
     function splitShares() {
       const selected = selectedParticipants();
       if (!selected.length) throw new Error("Choose at least one participant.");
@@ -1116,7 +1104,7 @@
       const sorted = [...filtered].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
       wrap.innerHTML = sorted.map(exp => {
         const participants = Object.keys(exp.splitShares || {});
-        const netAmount = getExpenseNetAmount(exp);
+        const netAmount = getNetAmount(exp);
         const hasRefund = Number(exp.refundAmount) > 0;
         let splitDetail = `${exp.splitType} split`;
         if (exp.splitType === 'exact' && exp.exactAmounts) {
@@ -1150,7 +1138,7 @@
     // ---------- Dashboard ----------
     function renderDashboard() {
       if (!state) return;
-      const total = sum(state.expenses.map(e => getExpenseNetAmount(e)));
+      const total = sum(state.expenses.map(e => getNetAmount(e)));
       $("totalSpend").textContent = fmtMoney(total);
       const balances = calculateBalances();
       const wrap = $("balanceWrap");
@@ -1182,7 +1170,7 @@
           </table>`;
       }
       const totals = Object.fromEntries(categories.map(c => [c, 0]));
-      for (const exp of state.expenses) { const cat = exp.category || "Other"; totals[cat] = (totals[cat] || 0) + getExpenseNetAmount(exp); }
+      for (const exp of state.expenses) { const cat = exp.category || "Other"; totals[cat] = (totals[cat] || 0) + getNetAmount(exp); }
       const rows = Object.entries(totals).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
       const barWrap = $("categoryBars");
       if (!rows.length) {
@@ -1262,7 +1250,7 @@
       if (!state) return {};
       const b = Object.fromEntries(state.people.map(n => [n, { paid: 0, owes: 0, net: 0 }]));
       for (const exp of state.expenses) {
-        const netAmt = getExpenseNetAmount(exp);
+        const netAmt = getNetAmount(exp);
         if (b[exp.paidBy]) b[exp.paidBy].paid += netAmt;
         for (const [name, share] of Object.entries(exp.splitShares || {})) {
           if (b[name]) b[name].owes += netAmt * share;
@@ -1351,7 +1339,6 @@
       $("paidBy").value = exp.paidBy;
       $("category").value = exp.category;
       $("splitType").value = exp.splitType;
-      // Refund fields
       const hasRefund = Number(exp.refundAmount) > 0;
       $("hasRefund").checked = hasRefund;
       if (hasRefund) {
@@ -1438,7 +1425,7 @@
       const shared = state.expenses.filter(e => e.splitShares && hasOwn(e.splitShares, name));
       $("removeTitle").textContent = `Remove "${name}"?`;
       $("removeSummary").innerHTML = `
-        Expenses paid by ${escapeHtml(name)}: <strong>${paid.length}</strong> (${fmtMoney(sum(paid.map(e => getExpenseNetAmount(e))))})<br />
+        Expenses paid by ${escapeHtml(name)}: <strong>${paid.length}</strong> (${fmtMoney(sum(paid.map(e => getNetAmount(e))))})<br />
         Expenses shared by ${escapeHtml(name)}: <strong>${shared.length}</strong><br /><br />
         <span style="color:var(--text-soft);">All their shares will be redistributed.</span>`;
       $("removeDialog").showModal();
@@ -1714,15 +1701,27 @@
     // ---------- Export / Import ----------
     function exportCsv() {
       if (!state) return;
-      const rows = [["Date", "Description", "Category", "Amount", "Refund Amount", "Refund Reason", "Net Amount", "Paid By", "Split Type", "Shared By"]];
+      const headers = ["Date", "Description", "Category", "Amount", "Refund Amount", "Refund Reason", "Net Amount", "Paid By", "Split Type", "Shared By", "Split Details"];
+      const rows = [headers];
       for (const exp of state.expenses) {
+        const netAmt = getNetAmount(exp);
+        const participants = Object.keys(exp.splitShares || {});
+        const shares = participants.map(name => {
+          const share = netAmt * (exp.splitShares[name] || 0);
+          return `${name}: ${fmtMoney(share)}`;
+        }).join(", ");
         rows.push([
-          exp.date, exp.description, exp.category, exp.amount,
+          exp.date,
+          exp.description,
+          exp.category,
+          exp.amount,
           exp.refundAmount || 0,
           exp.refundReason || '',
-          getExpenseNetAmount(exp),
-          exp.paidBy, exp.splitType,
-          Object.keys(exp.splitShares || {}).join("; ")
+          netAmt,
+          exp.paidBy,
+          exp.splitType,
+          participants.join("; "),
+          shares
         ]);
       }
       const text = rows.map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
