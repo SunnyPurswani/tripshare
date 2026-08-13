@@ -30,7 +30,6 @@
       --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
       --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
       --cat-food: #f59e0b; --cat-drinks: #ef4444; --cat-hotel: #8b5cf6; --cat-fuel: #10b981;
-
       --cat-activities: #3b82f6; --cat-shopping: #ec4899; --cat-transport: #06b6d4; --cat-other: #64748b;
     }
     [data-theme="dark"] {
@@ -188,6 +187,17 @@
     .exact-total { font-size: 13px; color: var(--text-muted); margin-top: 8px; text-align: right; font-weight: 500; }
     .exact-total .remaining { font-weight: 700; color: var(--coral); }
     .exact-total .remaining.zero { color: var(--emerald); }
+    /* Refund section */
+    .refund-section {
+      background: var(--bg-subtle); border: 1.5px dashed var(--border); border-radius: var(--radius-sm);
+      padding: 14px; margin-top: 6px; transition: all var(--transition-fast);
+    }
+    .refund-section.visible { border-color: var(--blue); background: var(--blue-soft); }
+    [data-theme="dark"] .refund-section.visible { border-color: rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.12); }
+    .refund-net-info { font-size: 14px; font-weight: 600; color: var(--text-soft); margin-top: 8px; }
+    .refund-net-info .original { color: var(--text-muted); text-decoration: line-through; }
+    .refund-net-info .net { color: var(--teal-600); font-weight: 700; }
+    [data-theme="dark"] .refund-net-info .net { color: var(--teal-500); }
     .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end; margin-top: 18px; }
     .toolbar-start { justify-content: flex-start; }
     .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
@@ -206,9 +216,15 @@
     .list-item:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); transform: translateX(2px); }
     .list-item .main { min-width: 0; }
     .list-item .main strong { display: block; font-weight: 650; overflow-wrap: anywhere; color: var(--text); font-size: 15px; }
+    .list-item .main strong .refund-badge { font-size: 12px; font-weight: 600; color: var(--blue-text); background: var(--blue-soft); padding: 2px 8px; border-radius: 999px; margin-left: 8px; }
+    [data-theme="dark"] .list-item .main strong .refund-badge { color: var(--blue-soft); background: rgba(59, 130, 246, 0.2); }
     .list-item .meta { color: var(--text-muted); font-size: 13px; margin-top: 3px; line-height: 1.5; }
     .list-item .meta .sep { margin: 0 5px; opacity: 0.4; }
+    .list-item .meta .refund-detail { color: var(--blue-text); background: var(--blue-soft); padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 500; display: inline-block; margin-top: 2px; }
+    [data-theme="dark"] .list-item .meta .refund-detail { color: var(--blue-soft); background: rgba(59, 130, 246, 0.2); }
     .list-item .amount { font-weight: 750; font-size: 18px; white-space: nowrap; letter-spacing: -0.02em; color: var(--text); }
+    .list-item .amount .net-amount { color: var(--teal-600); }
+    .list-item .amount .original-amount { color: var(--text-muted); text-decoration: line-through; font-weight: 400; font-size: 14px; margin-right: 6px; }
     .list-item .actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
     .list-item.cat-Food::before { background: var(--cat-food); }
     .list-item.cat-Drinks::before { background: var(--cat-drinks); }
@@ -436,6 +452,21 @@
                   <div id="exactAmounts" class="exact-grid hidden"></div>
                   <div id="exactTotal" class="exact-total hidden"></div>
                 </div>
+                <!-- Refund Section -->
+                <div class="wide">
+                  <label class="label-normal" style="display:flex; align-items:center; gap:10px; text-transform:none; font-weight:600; cursor:pointer;">
+                    <input type="checkbox" id="hasRefund" /> 💰 This expense includes a refund/correction
+                  </label>
+                  <div id="refundSection" class="refund-section hidden">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                      <label>Refund amount <input id="refundAmount" type="number" step="0.01" min="0" placeholder="0.00" /></label>
+                      <label>Refund reason <input id="refundReason" placeholder="e.g. Hotel refund" maxlength="80" /></label>
+                    </div>
+                    <div id="refundNetInfo" class="refund-net-info hidden">
+                      Original: <span class="original" id="refundOriginalDisplay">£0.00</span> &nbsp;→&nbsp; Net: <span class="net" id="refundNetDisplay">£0.00</span>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="toolbar">
                 <button id="cancelEditExpense" class="btn-ghost hidden" type="button">Cancel edit</button>
@@ -573,13 +604,11 @@
 
   <script type="module">
     /* ============================================================
-       TripShare v3 — Refined, Linear & Attractive
-       Bug fixes: Object.hasOwn compat, custom confirm modal,
-       loading states, debounced inputs, currency support,
-       dark mode, expense search, better mobile tabs.
+       TripShare v3 — with Refund/Correction feature
        ============================================================ */
     const APP_SUPABASE_URL = "https://cusegeussklgueqpwkbz.supabase.co";
     const APP_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1c2VnZXVzc2tsZ3VlcXB3a2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTc1MDksImV4cCI6MjA5NzQ3MzUwOX0.HOO_Ko5Rk9fKDVXEwGDZye5JupcvIwewH50tN19JRXE";
+    const TINY_BASE = "https://tinyurl.com/trpshr";
 
     const today = new Date().toISOString().slice(0, 10);
     const categories = ["Food","Drinks","Hotel","Fuel","Activities","Shopping","Transport","Other"];
@@ -649,6 +678,7 @@
     function clone(x) { return JSON.parse(JSON.stringify(x)); }
     function sum(arr) { return arr.reduce((a, b) => a + Number(b || 0), 0); }
     function roundMoney(v) { return Math.round((Number(v) + Number.EPSILON) * 100) / 100; }
+
     function escapeHtml(s) {
       return String(s ?? "").replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[ch]));
     }
@@ -732,12 +762,23 @@
       if (!supabase || !state || !tripId) return;
       const payload = { id: tripId, trip_name: state.tripName, payload: state, updated_at: new Date().toISOString() };
       const { error } = await supabase.from("trip_documents").upsert(payload);
-      if (error) setSyncStatus("Local", false, error.message);
+      if (error) {
+        setSyncStatus("Local", false, error.message);
+        toast("Failed to sync: " + error.message, "error");
+      }
+    }
+
+    // --- Refund helpers ---
+    function getNetAmount(expense) {
+      const amount = Number(expense.amount) || 0;
+      const refund = Number(expense.refundAmount) || 0;
+      return roundMoney(amount - refund);
     }
 
     function render() {
       if (!state || !tripId) { showLanding(true); return; }
       showLanding(false);
+      currencyFormatter = makeCurrencyFormatter(state.currency || "GBP");
       $("tripIdLabel").textContent = tripId;
       $("tripName").value = state.tripName;
       $("shortSlugDisplay").textContent = state.shortSlug || "—";
@@ -793,7 +834,7 @@
       const wrap = $("participantList");
       if (!count) { wrap.innerHTML = `<div class="empty-state"><span class="icon">👥</span>No participants yet. Add one above.</div>`; return; }
       wrap.innerHTML = state.people.map((name) => {
-        const paid = sum(state.expenses.filter(e => e.paidBy === name).map(e => e.amount));
+        const paid = sum(state.expenses.filter(e => e.paidBy === name).map(e => getNetAmount(e)));
         const shared = state.expenses.filter(e => e.splitShares && hasOwn(e.splitShares, name)).length;
         const avatar = getAvatar(name);
         return `
@@ -819,13 +860,22 @@
     function renderExpenseFormPeople() {
       if (!state) return;
       const paidBy = $("paidBy");
+      const currentPaidBy = paidBy.value;
       paidBy.innerHTML = state.people.map(n => `<option>${escapeHtml(n)}</option>`).join("");
+      if (currentPaidBy && state.people.includes(currentPaidBy)) {
+        paidBy.value = currentPaidBy;
+      } else if (state.people.length > 0) {
+        paidBy.value = state.people[0];
+      }
+
       const chips = $("shareChips");
       const checkedSet = new Set();
       if (isEditingExpense) {
         const editId = Number($("editingExpenseId").value || 0);
         const exp = state.expenses.find(e => e.id === editId);
-        if (exp?.splitShares) { for (const [name] of Object.entries(exp.splitShares)) checkedSet.add(name); }
+        if (exp?.splitShares) {
+          for (const [name] of Object.entries(exp.splitShares)) checkedSet.add(name);
+        }
       }
       chips.innerHTML = state.people.map(name => `
         <label class="chip">
@@ -834,7 +884,93 @@
         </label>`).join("");
       renderRatioInputs();
       renderExactInputs();
+
+      // Refund section
+      const hasRefund = $("hasRefund");
+      const refundSection = $("refundSection");
+      const refundAmount = $("refundAmount");
+      const refundReason = $("refundReason");
+      const refundNetInfo = $("refundNetInfo");
+      const refundOriginalDisplay = $("refundOriginalDisplay");
+      const refundNetDisplay = $("refundNetDisplay");
+
+      if (isEditingExpense) {
+        const editId = Number($("editingExpenseId").value || 0);
+        const exp = state.expenses.find(e => e.id === editId);
+        if (exp) {
+          const hasRefundVal = Number(exp.refundAmount) > 0;
+          hasRefund.checked = hasRefundVal;
+          if (hasRefundVal) {
+            refundAmount.value = exp.refundAmount;
+            refundReason.value = exp.refundReason || '';
+            refundSection.classList.remove('hidden');
+            refundSection.classList.add('visible');
+            updateRefundNetInfo(Number($("expenseAmount").value), Number(refundAmount.value));
+          } else {
+            refundSection.classList.add('hidden');
+            refundSection.classList.remove('visible');
+            refundNetInfo.classList.add('hidden');
+          }
+        }
+      } else {
+        // reset refund fields for new expense
+        hasRefund.checked = false;
+        refundAmount.value = '';
+        refundReason.value = '';
+        refundSection.classList.add('hidden');
+        refundSection.classList.remove('visible');
+        refundNetInfo.classList.add('hidden');
+      }
+
+      // Event listeners for refund
+      hasRefund.addEventListener('change', () => {
+        if (hasRefund.checked) {
+          refundSection.classList.remove('hidden');
+          refundSection.classList.add('visible');
+          // Pre-fill refund amount with expense amount if empty
+          if (!refundAmount.value) {
+            refundAmount.value = Number($("expenseAmount").value) || 0;
+          }
+          updateRefundNetInfo(Number($("expenseAmount").value), Number(refundAmount.value));
+        } else {
+          refundSection.classList.add('hidden');
+          refundSection.classList.remove('visible');
+          refundNetInfo.classList.add('hidden');
+        }
+      });
+
+      refundAmount.addEventListener('input', () => {
+        if (hasRefund.checked) {
+          updateRefundNetInfo(Number($("expenseAmount").value), Number(refundAmount.value));
+        }
+      });
+
+      $("expenseAmount").addEventListener('input', () => {
+        if (hasRefund.checked) {
+          updateRefundNetInfo(Number($("expenseAmount").value), Number(refundAmount.value));
+        }
+        // Also update exact total
+        updateExactTotal();
+      });
     }
+
+    function updateRefundNetInfo(original, refund) {
+      const net = roundMoney(original - refund);
+      const refundNetInfo = $("refundNetInfo");
+      const refundOriginalDisplay = $("refundOriginalDisplay");
+      const refundNetDisplay = $("refundNetDisplay");
+      if (original > 0 && refund >= 0) {
+        refundOriginalDisplay.textContent = fmtMoney(original);
+        refundNetDisplay.textContent = fmtMoney(net);
+        refundNetInfo.classList.remove('hidden');
+        if (refund > 0) {
+          refundNetInfo.style.color = 'var(--text-soft)';
+        }
+      } else {
+        refundNetInfo.classList.add('hidden');
+      }
+    }
+
     function renderRatioInputs() {
       if (!state) return;
       const isRatio = $("splitType").value === "ratio";
@@ -842,8 +978,20 @@
       wrap.classList.toggle("hidden", !isRatio);
       if (!isRatio) return;
       const selected = selectedParticipants();
+      const currentWeights = {};
+      if (isEditingExpense) {
+        const editId = Number($("editingExpenseId").value || 0);
+        const exp = state.expenses.find(e => e.id === editId);
+        if (exp?.ratioWeights) {
+          for (const [name, val] of Object.entries(exp.ratioWeights)) {
+            currentWeights[name] = val;
+          }
+        }
+      }
       wrap.innerHTML = selected.map(name => `
-        <label>${escapeHtml(name)}<input type="number" min="0.01" step="0.01" value="1" data-ratio-for="${escapeAttr(name)}" /></label>`).join("");
+        <label>${escapeHtml(name)}
+          <input type="number" min="0.01" step="0.01" value="${currentWeights[name] || 1}" data-ratio-for="${escapeAttr(name)}" />
+        </label>`).join("");
     }
     function renderExactInputs() {
       if (!state) return;
@@ -853,8 +1001,20 @@
       totalWrap.classList.toggle("hidden", !isExact);
       if (!isExact) return;
       const selected = selectedParticipants();
+      const currentAmounts = {};
+      if (isEditingExpense) {
+        const editId = Number($("editingExpenseId").value || 0);
+        const exp = state.expenses.find(e => e.id === editId);
+        if (exp?.exactAmounts) {
+          for (const [name, val] of Object.entries(exp.exactAmounts)) {
+            currentAmounts[name] = val;
+          }
+        }
+      }
       wrap.innerHTML = selected.map(name => `
-        <label>${escapeHtml(name)}<input type="number" min="0" step="0.01" value="0" data-exact-for="${escapeAttr(name)}" class="exact-input" /></label>`).join("");
+        <label>${escapeHtml(name)}
+          <input type="number" min="0" step="0.01" value="${currentAmounts[name] || 0}" data-exact-for="${escapeAttr(name)}" class="exact-input" />
+        </label>`).join("");
       wrap.querySelectorAll(".exact-input").forEach(input => input.addEventListener("input", updateExactTotal));
       if (isEditingExpense) {
         const editId = Number($("editingExpenseId").value || 0);
@@ -873,21 +1033,35 @@
       let total = 0;
       inputs.forEach(inp => { total += Number(inp.value) || 0; });
       const expenseTotal = Number($("expenseAmount").value) || 0;
-      const remaining = roundMoney(expenseTotal - total);
+      const refund = Number($("refundAmount").value) || 0;
+      const netTotal = roundMoney(expenseTotal - refund);
+      const remaining = roundMoney(netTotal - total);
       const totalWrap = $("exactTotal");
-      if (expenseTotal > 0) {
+      if (netTotal > 0) {
         totalWrap.innerHTML = `Allocated: ${fmtMoney(total)} &nbsp;|&nbsp; Remaining: <span class="remaining ${Math.abs(remaining) < 0.005 ? 'zero' : ''}">${fmtMoney(remaining)}</span>`;
-      } else { totalWrap.textContent = "Enter an amount first"; }
+      } else { totalWrap.textContent = "Enter a net amount first"; }
     }
+
     function selectedParticipants() {
       return [...document.querySelectorAll('input[name="sharedBy"]:checked')].map(i => i.value);
     }
+
+    function getExpenseNetAmount(expense) {
+      return roundMoney((Number(expense.amount) || 0) - (Number(expense.refundAmount) || 0));
+    }
+
     function splitShares() {
       const selected = selectedParticipants();
       if (!selected.length) throw new Error("Choose at least one participant.");
       const splitType = $("splitType").value;
+      const expenseAmount = Number($("expenseAmount").value) || 0;
+      const refundAmount = Number($("refundAmount").value) || 0;
+      const netAmount = roundMoney(expenseAmount - refundAmount);
+      if (netAmount <= 0 && expenseAmount > 0) {
+        throw new Error("Refund amount cannot exceed or equal the expense amount.");
+      }
       if (splitType === "equal") {
-        const share = 1 / selected.length;
+        const share = netAmount > 0 ? 1 / selected.length : 0;
         return { splitShares: Object.fromEntries(selected.map(n => [n, share])), ratioWeights: null, exactAmounts: null };
       }
       if (splitType === "ratio") {
@@ -909,9 +1083,8 @@
           if (val < 0) throw new Error(`Amount for "${name}" cannot be negative.`);
           amounts[name] = val; totalAmount += val;
         }
-        const expenseTotal = Number($("expenseAmount").value) || 0;
-        if (Math.abs(totalAmount - expenseTotal) > 0.005) {
-          throw new Error(`Total allocated (${fmtMoney(totalAmount)}) does not equal expense amount (${fmtMoney(expenseTotal)}).`);
+        if (Math.abs(totalAmount - netAmount) > 0.005) {
+          throw new Error(`Total allocated (${fmtMoney(totalAmount)}) does not equal net amount (${fmtMoney(netAmount)}).`);
         }
         const total = sum(Object.values(amounts));
         return { splitShares: Object.fromEntries(Object.entries(amounts).map(([n, amt]) => [n, total > 0 ? amt / total : 0])), ratioWeights: null, exactAmounts: amounts };
@@ -943,24 +1116,33 @@
       const sorted = [...filtered].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
       wrap.innerHTML = sorted.map(exp => {
         const participants = Object.keys(exp.splitShares || {});
+        const netAmount = getExpenseNetAmount(exp);
+        const hasRefund = Number(exp.refundAmount) > 0;
         let splitDetail = `${exp.splitType} split`;
         if (exp.splitType === 'exact' && exp.exactAmounts) {
           splitDetail = `Exact: ${Object.entries(exp.exactAmounts).map(([name, amt]) => `${name}: ${fmtMoney(amt)}`).join(', ')}`;
         } else {
           splitDetail = `${exp.splitType} split with ${participants.map(escapeHtml).join(", ")}`;
         }
+        const refundBadge = hasRefund ? `<span class="refund-badge">💰 Refund</span>` : '';
+        const refundDetail = hasRefund ? `<div class="refund-detail">Refund: ${fmtMoney(exp.refundAmount)}${exp.refundReason ? ` (${escapeHtml(exp.refundReason)})` : ''}</div>` : '';
         return `
           <div class="list-item cat-${escapeAttr(exp.category)}">
             <div class="main">
-              <strong>${escapeHtml(exp.description)}</strong>
+              <strong>${escapeHtml(exp.description)} ${refundBadge}</strong>
+              ${refundDetail}
               <div class="meta">${escapeHtml(exp.date)} <span class="sep">·</span> ${catEmoji[exp.category] || '📦'} ${escapeHtml(exp.category)} <span class="sep">·</span> paid by ${escapeHtml(exp.paidBy)}</div>
               <div class="meta">${escapeHtml(splitDetail)}</div>
+              ${hasRefund ? `<div class="meta" style="font-size:12px; color:var(--text-muted);">Original: ${fmtMoney(exp.amount)} &nbsp;→&nbsp; Net: <strong style="color:var(--teal-600);">${fmtMoney(netAmount)}</strong></div>` : ''}
               <div class="actions">
                 <button class="btn-ghost btn-xs edit-expense" data-id="${exp.id}" type="button">✎ Edit</button>
                 <button class="btn-ghost btn-xs delete-expense" data-id="${exp.id}" type="button">✕ Delete</button>
               </div>
             </div>
-            <div class="amount">${fmtMoney(exp.amount)}</div>
+            <div class="amount">
+              ${hasRefund ? `<span class="original-amount">${fmtMoney(exp.amount)}</span>` : ''}
+              <span class="net-amount">${fmtMoney(netAmount)}</span>
+            </div>
           </div>`;
       }).join("");
     }
@@ -968,7 +1150,7 @@
     // ---------- Dashboard ----------
     function renderDashboard() {
       if (!state) return;
-      const total = sum(state.expenses.map(e => e.amount));
+      const total = sum(state.expenses.map(e => getExpenseNetAmount(e)));
       $("totalSpend").textContent = fmtMoney(total);
       const balances = calculateBalances();
       const wrap = $("balanceWrap");
@@ -1000,7 +1182,7 @@
           </table>`;
       }
       const totals = Object.fromEntries(categories.map(c => [c, 0]));
-      for (const exp of state.expenses) { const cat = exp.category || "Other"; totals[cat] = (totals[cat] || 0) + exp.amount; }
+      for (const exp of state.expenses) { const cat = exp.category || "Other"; totals[cat] = (totals[cat] || 0) + getExpenseNetAmount(exp); }
       const rows = Object.entries(totals).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
       const barWrap = $("categoryBars");
       if (!rows.length) {
@@ -1080,9 +1262,10 @@
       if (!state) return {};
       const b = Object.fromEntries(state.people.map(n => [n, { paid: 0, owes: 0, net: 0 }]));
       for (const exp of state.expenses) {
-        if (b[exp.paidBy]) b[exp.paidBy].paid += exp.amount;
+        const netAmt = getExpenseNetAmount(exp);
+        if (b[exp.paidBy]) b[exp.paidBy].paid += netAmt;
         for (const [name, share] of Object.entries(exp.splitShares || {})) {
-          if (b[name]) b[name].owes += exp.amount * share;
+          if (b[name]) b[name].owes += netAmt * share;
         }
       }
       for (const s of state.settlements) {
@@ -1121,6 +1304,8 @@
       let split;
       try { split = splitShares(); } catch (err) { toast(err.message, "error"); return; }
       const id = Number($("editingExpenseId").value || 0);
+      const refundAmount = Number($("refundAmount").value) || 0;
+      const hasRefund = $("hasRefund").checked;
       const expense = {
         id: id || state.nextExpenseId++,
         date: $("expenseDate").value || today,
@@ -1132,17 +1317,20 @@
         splitShares: split.splitShares,
         ratioWeights: split.ratioWeights,
         exactAmounts: split.exactAmounts,
+        refundAmount: hasRefund ? roundMoney(refundAmount) : 0,
+        refundReason: hasRefund ? $("refundReason").value.trim() : '',
       };
       if (!expense.description || expense.amount <= 0) { toast("Please fill in description and amount.", "error"); return; }
+      if (hasRefund && refundAmount >= expense.amount) { toast("Refund amount must be less than the expense amount.", "error"); return; }
       snapshot();
       const idx = state.expenses.findIndex(e => e.id === id);
       if (idx >= 0) {
         state.expenses[idx] = expense;
-        state.audit.unshift(auditEvent(`Edited "${expense.description}"`));
+        state.audit.unshift(auditEvent(`Edited "${expense.description}"${hasRefund ? ` (refund: ${fmtMoney(refundAmount)})` : ''}`));
         toast(`Updated "${expense.description}"`, "success");
       } else {
         state.expenses.push(expense);
-        state.audit.unshift(auditEvent(`Added "${expense.description}"`));
+        state.audit.unshift(auditEvent(`Added "${expense.description}"${hasRefund ? ` (refund: ${fmtMoney(refundAmount)})` : ''}`));
         toast(`Added "${expense.description}"`, "success");
       }
       isEditingExpense = false;
@@ -1163,6 +1351,22 @@
       $("paidBy").value = exp.paidBy;
       $("category").value = exp.category;
       $("splitType").value = exp.splitType;
+      // Refund fields
+      const hasRefund = Number(exp.refundAmount) > 0;
+      $("hasRefund").checked = hasRefund;
+      if (hasRefund) {
+        $("refundAmount").value = exp.refundAmount;
+        $("refundReason").value = exp.refundReason || '';
+        $("refundSection").classList.remove('hidden');
+        $("refundSection").classList.add('visible');
+        updateRefundNetInfo(exp.amount, exp.refundAmount);
+      } else {
+        $("refundAmount").value = '';
+        $("refundReason").value = '';
+        $("refundSection").classList.add('hidden');
+        $("refundSection").classList.remove('visible');
+        $("refundNetInfo").classList.add('hidden');
+      }
       renderExpenseFormPeople();
       document.querySelectorAll('input[name="sharedBy"]').forEach(input => {
         input.checked = hasOwn(exp.splitShares || {}, input.value);
@@ -1203,6 +1407,12 @@
       $("editingExpenseId").value = "";
       $("expenseFormTitle").textContent = "🧾 Add expense";
       $("cancelEditExpense").classList.add("hidden");
+      $("hasRefund").checked = false;
+      $("refundAmount").value = '';
+      $("refundReason").value = '';
+      $("refundSection").classList.add('hidden');
+      $("refundSection").classList.remove('visible');
+      $("refundNetInfo").classList.add('hidden');
       isEditingExpense = false;
       renderExpenseFormPeople();
     }
@@ -1228,7 +1438,7 @@
       const shared = state.expenses.filter(e => e.splitShares && hasOwn(e.splitShares, name));
       $("removeTitle").textContent = `Remove "${name}"?`;
       $("removeSummary").innerHTML = `
-        Expenses paid by ${escapeHtml(name)}: <strong>${paid.length}</strong> (${fmtMoney(sum(paid.map(e => e.amount)))})<br />
+        Expenses paid by ${escapeHtml(name)}: <strong>${paid.length}</strong> (${fmtMoney(sum(paid.map(e => getExpenseNetAmount(e))))})<br />
         Expenses shared by ${escapeHtml(name)}: <strong>${shared.length}</strong><br /><br />
         <span style="color:var(--text-soft);">All their shares will be redistributed.</span>`;
       $("removeDialog").showModal();
@@ -1442,8 +1652,7 @@
       updateSyncStatusDetail();
     }
 
-    // ---------- Invite Links ----------
-    const TINY_BASE = "https://tinyurl.com/trpshr";
+    // ---------- Invite Links (TinyURL) ----------
     function buildInviteLink() {
       if (state && state.shortSlug) {
         return TINY_BASE + "/#join/" + state.shortSlug;
@@ -1452,11 +1661,13 @@
       }
       return TINY_BASE;
     }
+
     function buildShortInviteLink(slug) {
       const clean = normalizeSlug(slug);
       if (!clean) return "";
       return TINY_BASE + "/#join/" + clean;
     }
+
     function normalizeSlug(v) {
       return String(v || "").trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 32);
     }
@@ -1503,9 +1714,16 @@
     // ---------- Export / Import ----------
     function exportCsv() {
       if (!state) return;
-      const rows = [["Date", "Description", "Category", "Amount", "Paid By", "Split Type", "Shared By"]];
+      const rows = [["Date", "Description", "Category", "Amount", "Refund Amount", "Refund Reason", "Net Amount", "Paid By", "Split Type", "Shared By"]];
       for (const exp of state.expenses) {
-        rows.push([exp.date, exp.description, exp.category, exp.amount, exp.paidBy, exp.splitType, Object.keys(exp.splitShares || {}).join("; ")]);
+        rows.push([
+          exp.date, exp.description, exp.category, exp.amount,
+          exp.refundAmount || 0,
+          exp.refundReason || '',
+          getExpenseNetAmount(exp),
+          exp.paidBy, exp.splitType,
+          Object.keys(exp.splitShares || {}).join("; ")
+        ]);
       }
       const text = rows.map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
       download("tripshare-expenses.csv", text, "text/csv");
