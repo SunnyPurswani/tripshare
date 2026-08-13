@@ -11,6 +11,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;750&display=swap" rel="stylesheet" />
   <style>
+    /* ===== CSS (identical to previous full version) ===== */
+    /* I'm keeping it identical to avoid any accidental changes */
     :root {
       --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       --radius-sm: 8px; --radius: 12px; --radius-lg: 16px; --radius-xl: 24px;
@@ -602,7 +604,7 @@
 
   <script type="module">
     /* ============================================================
-       TripShare v3 — Complete with Refund/Correction & CSV Split Details
+       TripShare v3 — UI shows individual split amounts for all types
        ============================================================ */
     const APP_SUPABASE_URL = "https://cusegeussklgueqpwkbz.supabase.co";
     const APP_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1c2VnZXVzc2tsZ3VlcXB3a2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTc1MDksImV4cCI6MjA5NzQ3MzUwOX0.HOO_Ko5Rk9fKDVXEwGDZye5JupcvIwewH50tN19JRXE";
@@ -773,6 +775,12 @@
       return roundMoney(amount - refund);
     }
 
+    // --- CSV helper: plain number without currency symbol ---
+    function csvNumber(v) {
+      return Number(v).toFixed(2);
+    }
+
+    // ---------- RENDER ----------
     function render() {
       if (!state || !tripId) { showLanding(true); return; }
       showLanding(false);
@@ -883,7 +891,6 @@
       renderRatioInputs();
       renderExactInputs();
 
-      // Refund section
       const hasRefund = $("hasRefund");
       const refundSection = $("refundSection");
       const refundAmount = $("refundAmount");
@@ -919,7 +926,6 @@
         refundNetInfo.classList.add('hidden');
       }
 
-      // Event listeners
       hasRefund.addEventListener('change', () => {
         if (hasRefund.checked) {
           refundSection.classList.remove('hidden');
@@ -1106,12 +1112,21 @@
         const participants = Object.keys(exp.splitShares || {});
         const netAmount = getNetAmount(exp);
         const hasRefund = Number(exp.refundAmount) > 0;
-        let splitDetail = `${exp.splitType} split`;
+        
+        // --- Build split details with monetary amounts for ALL split types ---
+        let splitDetail;
         if (exp.splitType === 'exact' && exp.exactAmounts) {
+          // Exact split already has amounts
           splitDetail = `Exact: ${Object.entries(exp.exactAmounts).map(([name, amt]) => `${name}: ${fmtMoney(amt)}`).join(', ')}`;
         } else {
-          splitDetail = `${exp.splitType} split with ${participants.map(escapeHtml).join(", ")}`;
+          // Equal or Ratio: calculate monetary share for each participant
+          const shareDetails = participants.map(name => {
+            const share = netAmount * (exp.splitShares[name] || 0);
+            return `${name}: ${fmtMoney(share)}`;
+          }).join(', ');
+          splitDetail = `${exp.splitType} split: ${shareDetails}`;
         }
+
         const refundBadge = hasRefund ? `<span class="refund-badge">💰 Refund</span>` : '';
         const refundDetail = hasRefund ? `<div class="refund-detail">Refund: ${fmtMoney(exp.refundAmount)}${exp.refundReason ? ` (${escapeHtml(exp.refundReason)})` : ''}</div>` : '';
         return `
@@ -1701,32 +1716,78 @@
     // ---------- Export / Import ----------
     function exportCsv() {
       if (!state) return;
-      const headers = ["Date", "Description", "Category", "Amount", "Refund Amount", "Refund Reason", "Net Amount", "Paid By", "Split Type", "Shared By", "Split Details"];
-      const rows = [headers];
+      const rows = [];
+
+      const headers = [
+        "Date", "Description", "Category", "Amount",
+        "Refund Amount", "Refund Reason", "Net Amount",
+        "Paid By", "Split Type", "Shared By", "Split Details"
+      ];
+      rows.push(headers);
+
       for (const exp of state.expenses) {
         const netAmt = getNetAmount(exp);
         const participants = Object.keys(exp.splitShares || {});
         const shares = participants.map(name => {
           const share = netAmt * (exp.splitShares[name] || 0);
-          return `${name}: ${fmtMoney(share)}`;
+          return `${name}: ${csvNumber(share)}`;
         }).join(", ");
         rows.push([
           exp.date,
           exp.description,
           exp.category,
-          exp.amount,
-          exp.refundAmount || 0,
+          csvNumber(exp.amount),
+          csvNumber(exp.refundAmount || 0),
           exp.refundReason || '',
-          netAmt,
+          csvNumber(netAmt),
           exp.paidBy,
           exp.splitType,
           participants.join("; "),
           shares
         ]);
       }
+
+      rows.push([]);
+
+      rows.push([
+        "SUMMARY",
+        "Net Paid",
+        "Net Owes",
+        "Settlements Received",
+        "Settlements Paid",
+        "Net Balance",
+        "Owes To (creditor: amount)"
+      ]);
+
+      const balances = calculateBalances();
+      for (const name of state.people) {
+        const b = balances[name] || { paid: 0, owes: 0, net: 0 };
+        const settledReceived = sum(state.settlements.filter(s => s.to === name).map(s => s.amount));
+        const settledPaid = sum(state.settlements.filter(s => s.from === name).map(s => s.amount));
+        let owesTo = "";
+        if (b.net < -0.005) {
+          const settlements = calculateSettlements();
+          const owing = settlements.filter(s => s.from === name);
+          if (owing.length) {
+            owesTo = owing.map(s => `${s.to}: ${csvNumber(s.amount)}`).join("; ");
+          } else {
+            owesTo = `Total debt: ${csvNumber(-b.net)}`;
+          }
+        }
+        rows.push([
+          name,
+          csvNumber(b.paid),
+          csvNumber(b.owes),
+          csvNumber(settledReceived),
+          csvNumber(settledPaid),
+          csvNumber(b.net),
+          owesTo
+        ]);
+      }
+
       const text = rows.map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
       download("tripshare-expenses.csv", text, "text/csv");
-      toast("CSV exported", "success");
+      toast("CSV exported with summary", "success");
     }
     function exportJson() {
       if (!state) return;
@@ -1841,7 +1902,6 @@
       toast(`Currency set to ${state.currency}`, "success");
     });
 
-    // Landing
     $("landingNewTrip").addEventListener("click", initiateNewTrip);
     $("landingGoInvite").addEventListener("click", () => {
       const input = $("landingInviteInput").value.trim();
@@ -1850,7 +1910,6 @@
     });
     $("landingInviteInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("landingGoInvite").click(); });
 
-    // Create trip modal
     $("cancelCreateTrip").addEventListener("click", () => $("createTripModal").close());
     $("confirmCreateTrip").addEventListener("click", confirmCreateTrip);
     $("createSlugInput").addEventListener("input", () => {
@@ -1860,7 +1919,6 @@
     });
     $("createSlugInput").addEventListener("keydown", (e) => { if (e.key === "Enter") confirmCreateTrip(); });
 
-    // Escape key for modals
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         const openModal = document.querySelector("dialog[open]");
@@ -1868,7 +1926,6 @@
       }
     });
 
-    // Event delegation for dynamic elements
     document.addEventListener("click", (e) => {
       const btn = e.target.closest(".edit-expense");
       if (btn) { e.preventDefault(); editExpense(Number(btn.dataset.id)); }
