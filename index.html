@@ -12,17 +12,599 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;750&display=swap" rel="stylesheet" />
   <style>
     /* ===== CSS (identical to previous full version) ===== */
-    /* Keeping it concise – I assume the CSS is unchanged */
-    /* For completeness, I'd include it but to avoid excessive length, I'll rely on the previous one */
-    /* The CSS is exactly the same as the last full response. */
+    /* I'm keeping it identical to avoid any accidental changes */
+    :root {
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --radius-sm: 8px; --radius: 12px; --radius-lg: 16px; --radius-xl: 24px;
+      --transition-fast: 120ms ease; --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1); --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      --bg-body: #f1f5f9; --bg-panel: #ffffff; --bg-elevated: #ffffff; --bg-subtle: #f8fafc; --bg-hover: #f1f5f9; --bg-active: #e2e8f0;
+      --border: #e2e8f0; --border-strong: #cbd5e1;
+      --text: #0f172a; --text-soft: #334155; --text-muted: #64748b; --text-inverse: #ffffff;
+      --teal-50: #f0fdfa; --teal-100: #ccfbf1; --teal-500: #14b8a6; --teal-600: #0d9488; --teal-700: #0f766e; --teal-800: #115e59;
+      --coral: #ef4444; --coral-soft: #fee2e2; --coral-text: #991b1b;
+      --amber: #f59e0b; --amber-soft: #fef3c7; --amber-text: #92400e;
+      --emerald: #10b981; --emerald-soft: #d1fae5; --emerald-text: #065f46;
+      --blue: #3b82f6; --blue-soft: #dbeafe; --blue-text: #1e40af;
+      --violet: #8b5cf6; --violet-soft: #ede9fe; --violet-text: #5b21b6;
+      --tab-dashboard: var(--teal-600); --tab-expenses: var(--blue); --tab-people: var(--violet); --tab-settle: var(--amber); --tab-history: var(--coral); --tab-invite: var(--emerald);
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.02);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+      --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+      --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+      --cat-food: #f59e0b; --cat-drinks: #ef4444; --cat-hotel: #8b5cf6; --cat-fuel: #10b981;
+      --cat-activities: #3b82f6; --cat-shopping: #ec4899; --cat-transport: #06b6d4; --cat-other: #64748b;
+    }
+    [data-theme="dark"] {
+      --bg-body: #0f172a; --bg-panel: #1e293b; --bg-elevated: #334155; --bg-subtle: #1e293b; --bg-hover: #334155; --bg-active: #475569;
+      --border: #334155; --border-strong: #475569;
+      --text: #f1f5f9; --text-soft: #cbd5e1; --text-muted: #94a3b8; --text-inverse: #0f172a;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 1px 3px 0 rgb(0 0 0 / 0.2);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+      --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+      --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+    }
+    @media (prefers-color-scheme: dark) {
+      [data-theme="auto"] {
+        --bg-body: #0f172a; --bg-panel: #1e293b; --bg-elevated: #334155; --bg-subtle: #1e293b; --bg-hover: #334155; --bg-active: #475569;
+        --border: #334155; --border-strong: #475569;
+        --text: #f1f5f9; --text-soft: #cbd5e1; --text-muted: #94a3b8; --text-inverse: #0f172a;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 1px 3px 0 rgb(0 0 0 / 0.2);
+        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+        --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+        --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    html { font-family: var(--font); color: var(--text); background: var(--bg-body); -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+    body { margin: 0; min-height: 100vh; line-height: 1.5; }
+    h1 { font-size: clamp(26px, 4vw, 40px); font-weight: 750; letter-spacing: -0.03em; line-height: 1.1; color: var(--text); }
+    h2 { font-size: 18px; font-weight: 650; letter-spacing: -0.01em; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+    h2 small { font-weight: 400; font-size: 13px; color: var(--text-muted); margin-left: auto; }
+    h3 { font-size: 14px; font-weight: 600; color: var(--text-soft); margin-bottom: 10px; }
+    p { margin-top: 0; color: var(--text-muted); }
+    a { color: var(--teal-600); text-decoration: none; transition: opacity var(--transition-fast); }
+    a:hover { text-decoration: underline; opacity: 0.85; }
+    [data-theme="dark"] a { color: var(--teal-500); }
+    button {
+      font: inherit; border: 1px solid transparent; border-radius: var(--radius-sm); padding: 10px 18px;
+      background: var(--text); color: var(--text-inverse); cursor: pointer; min-height: 44px; font-weight: 600; font-size: 14px;
+      transition: all var(--transition-fast); display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      white-space: nowrap; user-select: none; touch-action: manipulation; position: relative; overflow: hidden;
+    }
+    button::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(255,255,255,0.12), transparent); opacity: 0; transition: opacity var(--transition-fast); }
+    button:hover::after { opacity: 1; }
+    button:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    button:active { transform: translateY(0); box-shadow: var(--shadow-sm); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+    button:disabled::after { display: none; }
+    .btn-ghost { background: transparent; color: var(--text-soft); border-color: var(--border); }
+    .btn-ghost:hover { background: var(--bg-hover); border-color: var(--border-strong); color: var(--text); }
+    .btn-accent { background: var(--teal-600); color: #fff; border-color: var(--teal-600); }
+    .btn-accent:hover { background: var(--teal-700); border-color: var(--teal-700); }
+    [data-theme="dark"] .btn-accent { background: var(--teal-500); border-color: var(--teal-500); }
+    [data-theme="dark"] .btn-accent:hover { background: var(--teal-600); border-color: var(--teal-600); }
+    .btn-danger { background: var(--coral); color: #fff; border-color: var(--coral); }
+    .btn-danger:hover { background: #dc2626; border-color: #dc2626; }
+    .btn-sm { min-height: 36px; padding: 6px 14px; font-size: 13px; }
+    .btn-xs { min-height: 32px; padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+    input, select, textarea {
+      font: inherit; width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px;
+      background: var(--bg-panel); color: var(--text); min-height: 44px; transition: all var(--transition-fast); font-size: 16px; outline: none;
+    }
+    input:hover, select:hover, textarea:hover { border-color: var(--border-strong); }
+    input:focus, select:focus, textarea:focus { border-color: var(--teal-500); box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15); }
+    [data-theme="dark"] input:focus, [data-theme="dark"] select:focus, [data-theme="dark"] textarea:focus { box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.25); }
+    input::placeholder { color: var(--text-muted); opacity: 0.7; }
+    textarea { min-height: 80px; resize: vertical; }
+    label { display: grid; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.03em; text-transform: uppercase; }
+    label .label-normal { text-transform: none; font-weight: 500; color: var(--text-soft); font-size: 14px; }
+    .app { max-width: 1280px; margin: 0 auto; padding: 20px 20px 40px; }
+    .topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; padding: 8px 0 16px; border-bottom: 1.5px solid var(--border); margin-bottom: 16px; }
+    .topbar-left { flex: 1 1 220px; }
+    .topbar-left p { color: var(--text-muted); font-size: 14px; margin: 4px 0 0; max-width: 520px; line-height: 1.5; }
+    .topbar-right { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex-shrink: 0; }
+    .trip-name-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; margin-bottom: 16px; }
+    .trip-name-row input { max-width: 300px; font-size: 17px; font-weight: 700; padding: 10px 14px; min-height: 48px; flex: 1 1 180px; min-width: 140px; letter-spacing: -0.01em; }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid var(--border); border-radius: 999px;
+      padding: 5px 14px 5px 10px; background: var(--bg-subtle); font-size: 13px; font-weight: 600; color: var(--text-muted);
+      white-space: nowrap; min-height: 34px; transition: all var(--transition-fast);
+    }
+    .status-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex-shrink: 0; position: relative; }
+    .status-pill .dot.live { background: var(--emerald); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
+    .status-pill .dot.live::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; border: 1.5px solid var(--emerald); opacity: 0.4; animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(1.6); opacity: 0; } }
+    .pill-new-trip {
+      display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--border); border-radius: 999px;
+      padding: 5px 14px 5px 10px; background: var(--bg-subtle); font-size: 13px; font-weight: 600; color: var(--text-muted);
+      white-space: nowrap; min-height: 34px; cursor: pointer; transition: all var(--transition-fast); font: inherit;
+    }
+    .pill-new-trip:hover { background: var(--bg-hover); border-color: var(--border-strong); color: var(--text); }
+    .app-layout { display: flex; gap: 24px; align-items: flex-start; }
+    .tabs-vertical {
+      display: flex; flex-direction: column; gap: 4px; padding: 8px; background: var(--bg-panel);
+      border: 1.5px solid var(--border); border-radius: var(--radius-lg); min-width: 160px; flex-shrink: 0;
+      position: sticky; top: 20px; box-shadow: var(--shadow-sm);
+    }
+    .tabs-vertical button {
+      background: transparent; color: var(--text-muted); border-color: transparent; white-space: nowrap;
+      padding: 12px 16px; font-weight: 600; font-size: 14px; border-radius: var(--radius-sm); min-height: 48px;
+      justify-content: flex-start; width: 100%; transition: all var(--transition-fast); position: relative;
+    }
+    .tabs-vertical button:hover { background: var(--bg-hover); color: var(--text-soft); transform: none; box-shadow: none; }
+    .tabs-vertical button.active { color: #fff; box-shadow: var(--shadow-sm); }
+    .tabs-vertical button .tab-icon { margin-right: 10px; font-size: 18px; line-height: 1; }
+    .tabs-vertical button .tab-label { position: relative; }
+    .tabs-vertical button.active .tab-label::after { content: ''; position: absolute; right: -8px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.6); }
+    .tabs-vertical button[data-tab="dashboard"].active { background: var(--tab-dashboard); }
+    .tabs-vertical button[data-tab="dashboard"]:not(.active):hover { color: var(--tab-dashboard); background: var(--teal-50); }
+    .tabs-vertical button[data-tab="expenses"].active { background: var(--tab-expenses); }
+    .tabs-vertical button[data-tab="expenses"]:not(.active):hover { color: var(--tab-expenses); background: var(--blue-soft); }
+    .tabs-vertical button[data-tab="people"].active { background: var(--tab-people); }
+    .tabs-vertical button[data-tab="people"]:not(.active):hover { color: var(--tab-people); background: var(--violet-soft); }
+    .tabs-vertical button[data-tab="settle"].active { background: var(--tab-settle); }
+    .tabs-vertical button[data-tab="settle"]:not(.active):hover { color: var(--tab-settle); background: var(--amber-soft); }
+    .tabs-vertical button[data-tab="history"].active { background: var(--tab-history); }
+    .tabs-vertical button[data-tab="history"]:not(.active):hover { color: var(--tab-history); background: var(--coral-soft); }
+    .tabs-vertical button[data-tab="invite"].active { background: var(--tab-invite); }
+    .tabs-vertical button[data-tab="invite"]:not(.active):hover { color: var(--tab-invite); background: var(--emerald-soft); }
+    [data-theme="dark"] .tabs-vertical button[data-tab="dashboard"]:not(.active):hover { background: rgba(20, 184, 166, 0.12); }
+    [data-theme="dark"] .tabs-vertical button[data-tab="expenses"]:not(.active):hover { background: rgba(59, 130, 246, 0.12); }
+    [data-theme="dark"] .tabs-vertical button[data-tab="people"]:not(.active):hover { background: rgba(139, 92, 246, 0.12); }
+    [data-theme="dark"] .tabs-vertical button[data-tab="settle"]:not(.active):hover { background: rgba(245, 158, 11, 0.12); }
+    [data-theme="dark"] .tabs-vertical button[data-tab="history"]:not(.active):hover { background: rgba(239, 68, 68, 0.12); }
+    [data-theme="dark"] .tabs-vertical button[data-tab="invite"]:not(.active):hover { background: rgba(16, 185, 129, 0.12); }
+    .content-area { flex: 1; min-width: 0; }
+    .section { display: none; animation: fadeUp 250ms cubic-bezier(0.4, 0, 0.2, 1); }
+    .section.active { display: block; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .grid-2 { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.6fr); gap: 20px; align-items: start; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .panel { background: var(--bg-panel); border: 1.5px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 20px; transition: all var(--transition-fast); }
+    .panel:hover { box-shadow: var(--shadow); }
+    .panel.flat { box-shadow: none; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+    .panel-header h2 { margin-bottom: 0; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; }
+    .form-grid .wide { grid-column: 1 / -1; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--border); border-radius: 999px;
+      padding: 7px 14px 7px 10px; background: var(--bg-panel); font-size: 14px; min-height: 38px;
+      transition: all var(--transition-fast); cursor: default; font-weight: 500; color: var(--text-soft);
+    }
+    .chip:hover { border-color: var(--border-strong); background: var(--bg-hover); }
+    .chip input[type="checkbox"] { width: 18px; height: 18px; min-height: 0; margin: 0; accent-color: var(--teal-600); cursor: pointer; }
+    .chip input[type="number"] { width: 60px; min-height: 0; padding: 4px 6px; font-size: 14px; border-radius: 6px; text-align: center; border-color: var(--border); background: var(--bg-subtle); }
+    .ratio-grid, .exact-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px 14px;
+      margin-top: 10px; padding: 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--bg-subtle);
+    }
+    .ratio-grid { border-color: var(--teal-100); background: var(--teal-50); }
+    [data-theme="dark"] .ratio-grid { border-color: rgba(20, 184, 166, 0.2); background: rgba(20, 184, 166, 0.08); }
+    .exact-grid { border-color: var(--blue-soft); background: var(--blue-soft); opacity: 0.6; }
+    [data-theme="dark"] .exact-grid { border-color: rgba(59, 130, 246, 0.2); background: rgba(59, 130, 246, 0.08); }
+    .ratio-grid label, .exact-grid label { text-transform: none; font-weight: 500; color: var(--text-soft); font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .ratio-grid label input, .exact-grid label input { width: 70px; min-height: 0; padding: 5px; text-align: center; font-size: 14px; background: var(--bg-panel); }
+    .exact-total { font-size: 13px; color: var(--text-muted); margin-top: 8px; text-align: right; font-weight: 500; }
+    .exact-total .remaining { font-weight: 700; color: var(--coral); }
+    .exact-total .remaining.zero { color: var(--emerald); }
+    .refund-section {
+      background: var(--bg-subtle); border: 1.5px dashed var(--border); border-radius: var(--radius-sm);
+      padding: 14px; margin-top: 6px; transition: all var(--transition-fast);
+    }
+    .refund-section.visible { border-color: var(--blue); background: var(--blue-soft); }
+    [data-theme="dark"] .refund-section.visible { border-color: rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.12); }
+    .refund-net-info { font-size: 14px; font-weight: 600; color: var(--text-soft); margin-top: 8px; }
+    .refund-net-info .original { color: var(--text-muted); text-decoration: line-through; }
+    .refund-net-info .net { color: var(--teal-600); font-weight: 700; }
+    [data-theme="dark"] .refund-net-info .net { color: var(--teal-500); }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end; margin-top: 18px; }
+    .toolbar-start { justify-content: flex-start; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .empty-state {
+      color: var(--text-muted); border: 2px dashed var(--border); border-radius: var(--radius);
+      padding: 32px 20px; text-align: center; background: var(--bg-subtle); font-size: 14px; font-weight: 500;
+    }
+    .empty-state .icon { font-size: 32px; display: block; margin-bottom: 10px; opacity: 0.7; }
+    .list { display: grid; gap: 12px; margin-top: 12px; }
+    .list-item {
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-panel);
+      padding: 14px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px 16px; align-items: center; transition: all var(--transition-fast); position: relative; overflow: hidden;
+    }
+    .list-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--border); transition: background var(--transition-fast); }
+    .list-item:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); transform: translateX(2px); }
+    .list-item .main { min-width: 0; }
+    .list-item .main strong { display: block; font-weight: 650; overflow-wrap: anywhere; color: var(--text); font-size: 15px; }
+    .list-item .main strong .refund-badge { font-size: 12px; font-weight: 600; color: var(--blue-text); background: var(--blue-soft); padding: 2px 8px; border-radius: 999px; margin-left: 8px; }
+    [data-theme="dark"] .list-item .main strong .refund-badge { color: var(--blue-soft); background: rgba(59, 130, 246, 0.2); }
+    .list-item .meta { color: var(--text-muted); font-size: 13px; margin-top: 3px; line-height: 1.5; }
+    .list-item .meta .sep { margin: 0 5px; opacity: 0.4; }
+    .list-item .meta .refund-detail { color: var(--blue-text); background: var(--blue-soft); padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 500; display: inline-block; margin-top: 2px; }
+    [data-theme="dark"] .list-item .meta .refund-detail { color: var(--blue-soft); background: rgba(59, 130, 246, 0.2); }
+    .list-item .amount { font-weight: 750; font-size: 18px; white-space: nowrap; letter-spacing: -0.02em; color: var(--text); }
+    .list-item .amount .net-amount { color: var(--teal-600); }
+    .list-item .amount .original-amount { color: var(--text-muted); text-decoration: line-through; font-weight: 400; font-size: 14px; margin-right: 6px; }
+    .list-item .actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .list-item.cat-Food::before { background: var(--cat-food); }
+    .list-item.cat-Drinks::before { background: var(--cat-drinks); }
+    .list-item.cat-Hotel::before { background: var(--cat-hotel); }
+    .list-item.cat-Fuel::before { background: var(--cat-fuel); }
+    .list-item.cat-Activities::before { background: var(--cat-activities); }
+    .list-item.cat-Shopping::before { background: var(--cat-shopping); }
+    .list-item.cat-Transport::before { background: var(--cat-transport); }
+    .list-item.cat-Other::before { background: var(--cat-other); }
+    .stat-card {
+      background: var(--bg-panel); border: 1.5px solid var(--border); border-radius: var(--radius);
+      padding: 18px 16px; text-align: center; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; transition: all var(--transition-fast);
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--teal-500); opacity: 0.8; }
+    .stat-card:nth-child(2)::after { background: var(--blue); }
+    .stat-card:nth-child(3)::after { background: var(--violet); }
+    .stat-card span { color: var(--text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+    .stat-card strong { display: block; margin-top: 6px; font-size: 28px; font-weight: 750; letter-spacing: -0.02em; color: var(--text); }
+    .balance-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+    .balance-table th, .balance-table td { border-bottom: 1.5px solid var(--border); padding: 10px 8px; text-align: right; transition: background var(--transition-fast); }
+    .balance-table tbody tr:hover td { background: var(--bg-hover); }
+    .balance-table th:first-child, .balance-table td:first-child { text-align: left; font-weight: 600; padding-left: 12px; border-radius: 6px 0 0 6px; }
+    .balance-table td:last-child { border-radius: 0 6px 6px 0; padding-right: 12px; }
+    .balance-table th { font-weight: 600; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; border-bottom-width: 2px; }
+    .balance-table .positive { color: var(--emerald); font-weight: 700; }
+    .balance-table .negative { color: var(--coral); font-weight: 700; }
+    .balance-table .neutral { color: var(--text-muted); font-weight: 600; }
+    .cat-bar-row { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; gap: 12px; align-items: center; font-size: 14px; padding: 6px 0; }
+    .cat-bar-row .bar-track { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; position: relative; }
+    .cat-bar-row .bar-fill { display: block; height: 100%; border-radius: inherit; transition: width 500ms cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+    .cat-bar-row .bar-fill::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent); animation: shimmer 2s infinite; }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    .cat-bar-row .cat-label { font-weight: 600; color: var(--text-soft); }
+    .cat-bar-row .cat-amount { font-weight: 700; text-align: right; font-size: 14px; }
+    .settlement-item {
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px 18px;
+      background: var(--bg-subtle); display: flex; flex-wrap: wrap; align-items: center;
+      justify-content: space-between; gap: 8px 16px; transition: all var(--transition-fast);
+    }
+    .settlement-item:hover { border-color: var(--border-strong); transform: translateX(2px); }
+    .settlement-item strong { font-weight: 700; }
+    .settlement-item .arrow { color: var(--text-muted); margin: 0 6px; font-size: 16px; }
+    .audit-item {
+      border-bottom: 1.5px solid var(--border); padding: 10px 0;
+      display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 14px;
+      font-size: 14px; align-items: center;
+    }
+    .audit-item:last-child { border-bottom: 0; }
+    .audit-item .time { color: var(--text-muted); font-size: 12px; white-space: nowrap; font-weight: 500; }
+    .notice {
+      border: 1.5px solid var(--amber-soft); background: var(--amber-soft); color: var(--amber-text);
+      border-radius: var(--radius-sm); padding: 12px 16px; font-size: 14px; line-height: 1.6;
+      margin-bottom: 14px; font-weight: 500;
+    }
+    .notice-info { border-color: var(--blue-soft); background: var(--blue-soft); color: var(--blue-text); }
+    .search-wrap { position: relative; margin-bottom: 14px; }
+    .search-wrap input { padding-left: 40px; background: var(--bg-subtle); }
+    .search-wrap .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; pointer-events: none; }
+    dialog.modal {
+      border: 0; border-radius: var(--radius-lg); max-width: 480px; width: calc(100% - 32px);
+      padding: 0; box-shadow: var(--shadow-lg); background: transparent;
+      animation: modalIn 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    dialog.modal::backdrop { background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); animation: backdropIn 200ms ease; }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(-20px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
+    dialog.modal .modal-body { background: var(--bg-panel); border-radius: var(--radius-lg); padding: 28px; border: 1.5px solid var(--border); }
+    dialog.modal .modal-body h2 { margin-bottom: 10px; }
+    .loading-overlay {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px);
+      z-index: 2000; display: none; align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px; color: #fff; font-weight: 600; font-size: 16px;
+    }
+    .loading-overlay.active { display: flex; }
+    .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .toast-container {
+      position: fixed; bottom: 24px; right: 24px; display: grid; gap: 12px;
+      z-index: 999; max-width: 400px; width: calc(100% - 48px); pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto; background: var(--bg-elevated); color: var(--text);
+      padding: 16px 20px; border-radius: var(--radius); box-shadow: var(--shadow-lg);
+      font-size: 14px; line-height: 1.5; animation: toastIn 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; align-items: flex-start; gap: 12px; border: 1.5px solid var(--border); font-weight: 500;
+    }
+    .toast.success { border-color: var(--emerald); background: var(--emerald-soft); color: var(--emerald-text); }
+    .toast.error { border-color: var(--coral); background: var(--coral-soft); color: var(--coral-text); }
+    .toast.info { border-color: var(--blue); background: var(--blue-soft); color: var(--blue-text); }
+    .toast .toast-close { background: transparent; border: 0; color: currentColor; opacity: 0.5; padding: 0 0 0 8px; min-height: 0; font-size: 20px; line-height: 1; cursor: pointer; flex-shrink: 0; margin-left: auto; }
+    .toast .toast-close:hover { opacity: 1; transform: none; box-shadow: none; filter: none; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(16px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    #landingOverlay { display: none; position: fixed; inset: 0; background: var(--bg-body); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; padding: 24px; text-align: center; }
+    #landingOverlay.active { display: flex; }
+    .landing-card { max-width: 480px; background: var(--bg-panel); border-radius: var(--radius-xl); padding: 48px 36px; box-shadow: var(--shadow-lg); border: 1.5px solid var(--border); animation: fadeUp 400ms ease; }
+    .landing-card h1 { margin-bottom: 10px; }
+    .landing-card p { margin-bottom: 32px; font-size: 16px; }
+    .landing-input-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+    .theme-toggle { width: 40px; height: 40px; border-radius: 50%; padding: 0; min-height: 0; background: var(--bg-subtle); border: 1.5px solid var(--border); color: var(--text-muted); font-size: 18px; cursor: pointer; transition: all var(--transition-fast); }
+    .theme-toggle:hover { background: var(--bg-hover); color: var(--text); transform: rotate(15deg); }
+    .hidden { display: none !important; }
+    @media (max-width: 900px) {
+      .app-layout { flex-direction: column; }
+      .tabs-vertical { flex-direction: row; overflow-x: auto; min-width: 0; width: 100%; position: static; padding: 6px; gap: 6px; -webkit-overflow-scrolling: touch; scrollbar-width: none; border-radius: var(--radius); }
+      .tabs-vertical::-webkit-scrollbar { display: none; }
+      .tabs-vertical button { padding: 8px 14px; min-height: 40px; font-size: 13px; white-space: nowrap; flex-shrink: 0; width: auto; justify-content: center; gap: 4px; background: transparent; border-radius: 999px; border: 1.5px solid transparent; }
+      .tabs-vertical button .tab-label { display: none; }
+      .tabs-vertical button.active .tab-label { display: inline; }
+      .tabs-vertical button .tab-icon { margin-right: 0; font-size: 18px; }
+      .tabs-vertical button.active .tab-icon { margin-right: 6px; font-size: 16px; }
+      .tabs-vertical button.active { color: #fff !important; box-shadow: var(--shadow-sm) !important; padding: 8px 16px; }
+      .tabs-vertical button.active[data-tab="dashboard"] { background: var(--tab-dashboard) !important; border-color: var(--tab-dashboard) !important; }
+      .tabs-vertical button.active[data-tab="expenses"] { background: var(--tab-expenses) !important; border-color: var(--tab-expenses) !important; }
+      .tabs-vertical button.active[data-tab="people"] { background: var(--tab-people) !important; border-color: var(--tab-people) !important; }
+      .tabs-vertical button.active[data-tab="settle"] { background: var(--tab-settle) !important; border-color: var(--tab-settle) !important; }
+      .tabs-vertical button.active[data-tab="history"] { background: var(--tab-history) !important; border-color: var(--tab-history) !important; }
+      .tabs-vertical button.active[data-tab="invite"] { background: var(--tab-invite) !important; border-color: var(--tab-invite) !important; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: repeat(3, 1fr); }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid .wide { grid-column: 1; }
+      .app { padding: 16px 16px 28px; }
+    }
+    @media (max-width: 640px) {
+      .grid-3 { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; align-items: stretch; gap: 6px; }
+      .topbar-right { justify-content: flex-start; }
+      .trip-name-row input { max-width: 100%; flex: 1 1 100%; min-width: 80px; }
+      .list-item { grid-template-columns: 1fr; }
+      .list-item .amount { text-align: left; font-size: 17px; }
+      .cat-bar-row { grid-template-columns: 90px minmax(0, 1fr); gap: 8px; }
+      .cat-bar-row .cat-amount { grid-column: 2; text-align: left; }
+      .stat-card strong { font-size: 24px; }
+      .ratio-grid, .exact-grid { grid-template-columns: 1fr 1fr; }
+      .landing-card { padding: 32px 24px; }
+    }
+    @media (max-width: 420px) {
+      .ratio-grid, .exact-grid { grid-template-columns: 1fr; }
+      .stat-card strong { font-size: 22px; }
+      .panel { padding: 16px; }
+      dialog.modal .modal-body { padding: 20px; }
+    }
+    @media print {
+      .tabs-vertical, .topbar-right, .toolbar, .actions, .btn-ghost { display: none !important; }
+      .panel { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+      body { background: #fff; }
+    }
   </style>
 </head>
 <body>
-  <!-- ===== HTML (identical to previous full version) ===== -->
-  <!-- The HTML is the same; only the JavaScript renderDashboard function changes -->
+  <div id="loadingOverlay" class="loading-overlay"><div class="spinner"></div><span id="loadingText">Loading…</span></div>
+  <main class="app" id="mainApp">
+    <header class="topbar">
+      <div class="topbar-left"><h1>🧳 TripShare</h1><p>Shared trip expenses &bull; Equal, ratio &amp; exact splits &bull; Live sync</p></div>
+      <div class="topbar-right">
+        <button id="themeToggle" class="theme-toggle" type="button" title="Toggle theme">🌓</button>
+        <span class="status-pill"><span id="syncDot" class="dot"></span><span id="syncLabel">Local</span></span>
+        <button id="copyInvite" class="btn-ghost btn-sm" type="button">📋 Copy invite</button>
+      </div>
+    </header>
+    <div class="trip-name-row" id="tripNameRow">
+      <input id="tripName" aria-label="Trip name" maxlength="80" placeholder="Trip name…" />
+      <span class="status-pill">🔗 <span id="shortSlugDisplay">—</span></span>
+      <span class="status-pill">🆔 <span id="tripIdLabel">—</span></span>
+      <button id="newTripQuick" class="pill-new-trip" type="button">🔄 New trip</button>
+    </div>
+    <div class="app-layout" id="appLayout">
+      <nav class="tabs-vertical" aria-label="Sections">
+        <button class="tab active" data-tab="dashboard" type="button"><span class="tab-icon">📊</span><span class="tab-label">Dashboard</span></button>
+        <button class="tab" data-tab="expenses" type="button"><span class="tab-icon">🧾</span><span class="tab-label">Expenses</span></button>
+        <button class="tab" data-tab="people" type="button"><span class="tab-icon">👥</span><span class="tab-label">People</span></button>
+        <button class="tab" data-tab="settle" type="button"><span class="tab-icon">⚖️</span><span class="tab-label">Settle</span></button>
+        <button class="tab" data-tab="history" type="button"><span class="tab-icon">📜</span><span class="tab-label">History</span></button>
+        <button class="tab" data-tab="invite" type="button"><span class="tab-icon">🔗</span><span class="tab-label">Invite</span></button>
+      </nav>
+      <div class="content-area">
+        <section id="dashboard" class="section active">
+          <div class="grid-3" style="margin-bottom:20px;">
+            <div class="stat-card"><span>Total spend</span><strong id="totalSpend">£0.00</strong></div>
+            <div class="stat-card"><span>Expenses</span><strong id="expenseCount">0</strong></div>
+            <div class="stat-card"><span>Participants</span><strong id="personCount">0</strong></div>
+          </div>
+          <div class="grid-2">
+            <div class="panel">
+              <h2>💰 Balances</h2>
+              <div id="balanceWrap"></div>
+              <div style="margin-top:20px; border-top:1.5px solid var(--border); padding-top:18px;">
+                <h3 style="margin-bottom:10px;">⚡ Settlement preview</h3>
+                <div id="settlementPreview"></div>
+              </div>
+            </div>
+            <div class="panel">
+              <h2>📂 Categories</h2>
+              <div id="categoryBars"></div>
+            </div>
+          </div>
+        </section>
+        <section id="expenses" class="section">
+          <div class="grid-2">
+            <form id="expenseForm" class="panel">
+              <h2 id="expenseFormTitle">🧾 Add expense</h2>
+              <input id="editingExpenseId" type="hidden" />
+              <div class="form-grid">
+                <label>Date <input id="expenseDate" type="date" required /></label>
+                <label>Amount <input id="expenseAmount" type="number" step="0.01" min="0.01" required /></label>
+                <label class="wide">Description <input id="expenseDescription" maxlength="120" required /></label>
+                <label>Paid by <select id="paidBy" required></select></label>
+                <label>Category
+                  <select id="category">
+                    <option value="Food">🍔 Food</option><option value="Drinks">🍺 Drinks</option><option value="Hotel">🏨 Hotel</option>
+                    <option value="Fuel">⛽ Fuel</option><option value="Activities">🎯 Activities</option><option value="Shopping">🛍️ Shopping</option>
+                    <option value="Transport">🚌 Transport</option><option value="Other">📦 Other</option>
+                  </select>
+                </label>
+                <label>Split type
+                  <select id="splitType">
+                    <option value="equal">⚖️ Equal</option><option value="ratio">📊 Ratio</option><option value="exact">🎯 Exact Amount</option>
+                  </select>
+                </label>
+                <div class="wide">
+                  <h3>Shared by</h3>
+                  <div id="shareChips" class="chips"></div>
+                  <div id="ratioWeights" class="ratio-grid hidden"></div>
+                  <div id="exactAmounts" class="exact-grid hidden"></div>
+                  <div id="exactTotal" class="exact-total hidden"></div>
+                </div>
+                <div class="wide">
+                  <label class="label-normal" style="display:flex; align-items:center; gap:10px; text-transform:none; font-weight:600; cursor:pointer;">
+                    <input type="checkbox" id="hasRefund" /> 💰 This expense includes a refund/correction
+                  </label>
+                  <div id="refundSection" class="refund-section hidden">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                      <label>Refund amount <input id="refundAmount" type="number" step="0.01" min="0" placeholder="0.00" /></label>
+                      <label>Refund reason <input id="refundReason" placeholder="e.g. Hotel refund" maxlength="80" /></label>
+                    </div>
+                    <div id="refundNetInfo" class="refund-net-info hidden">
+                      Original: <span class="original" id="refundOriginalDisplay">£0.00</span> &nbsp;→&nbsp; Net: <span class="net" id="refundNetDisplay">£0.00</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="toolbar">
+                <button id="cancelEditExpense" class="btn-ghost hidden" type="button">Cancel edit</button>
+                <button class="btn-accent" type="submit">💾 Save expense</button>
+              </div>
+            </form>
+            <div class="panel">
+              <div class="panel-header">
+                <h2>Expenses <small id="expenseCountSmall">0</small></h2>
+                <button id="exportCsv" class="btn-ghost btn-sm" type="button">⬇ CSV</button>
+              </div>
+              <div class="search-wrap"><span class="search-icon">🔍</span><input id="expenseSearch" type="text" placeholder="Search expenses…" /></div>
+              <div id="expenseList" class="list"></div>
+            </div>
+          </div>
+        </section>
+        <section id="people" class="section">
+          <div class="grid-2">
+            <form id="personForm" class="panel">
+              <h2>👤 Add participant</h2>
+              <div class="row"><input id="personName" maxlength="40" placeholder="Name" required style="flex:1;" /><button class="btn-accent" type="submit">➕ Add</button></div>
+            </form>
+            <div class="panel">
+              <div class="panel-header"><h2>Participants <small id="personCountSmall">0</small></h2><button id="undoBtn" class="btn-ghost btn-sm" type="button" disabled>↩ Undo</button></div>
+              <div id="participantList" class="list"></div>
+            </div>
+          </div>
+        </section>
+        <section id="settle" class="section">
+          <div class="grid-2">
+            <div class="panel">
+              <h2>💸 Record a payment</h2>
+              <form id="settlementForm" class="form-grid" style="grid-template-columns:1fr 1fr; gap:12px;">
+                <label>From <select id="settlementFrom" required><option value="">— Select —</option></select></label>
+                <label>To <select id="settlementTo" required><option value="">— Select —</option></select></label>
+                <label>Amount <input id="settlementAmount" type="number" step="0.01" min="0.01" required /></label>
+                <label>Date <input id="settlementDate" type="date" required /></label>
+                <div class="wide" style="display:flex; gap:10px; justify-content:flex-end;"><button type="submit" class="btn-accent">💸 Record payment</button></div>
+              </form>
+              <div style="margin-top:20px; border-top:1.5px solid var(--border); padding-top:18px;">
+                <h3>Manual settlements</h3>
+                <div id="manualSettlementsList" class="list"></div>
+              </div>
+            </div>
+            <div class="panel">
+              <h2>✅ Suggested settlements</h2>
+              <div id="settlements" class="list"></div>
+              <div class="toolbar"><button id="copySettlements" class="btn-accent" type="button">📋 Copy settlements</button></div>
+              <hr style="border:0; border-top:1.5px solid var(--border); margin:20px 0;" />
+              <h2>🔄 Export / Import</h2>
+              <div class="row" style="margin-bottom:12px;">
+                <button id="exportJson" class="btn-ghost" type="button">⬇ Export JSON</button>
+                <label class="btn-ghost" style="border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:8px 16px; min-height:44px; cursor:pointer; font-weight:600; font-size:14px; display:inline-flex; align-items:center; gap:6px; margin:0;">📤 Import JSON <input id="importJson" type="file" accept="application/json,.json" class="hidden" /></label>
+              </div>
+              <div class="notice notice-info">Import overwrites current trip data. Export includes full state.</div>
+            </div>
+          </div>
+        </section>
+        <section id="history" class="section">
+          <div class="panel"><h2>📜 Audit log</h2><div id="auditLog" class="list"></div></div>
+        </section>
+        <section id="invite" class="section">
+          <div class="grid-2">
+            <div class="panel">
+              <h2>🔗 Invite links</h2>
+              <label>Full invite link <input id="inviteLink" readonly /></label>
+              <div class="toolbar toolbar-start"><button id="newTrip" class="btn-ghost btn-sm" type="button">🔄 New trip</button><button id="copyInvite2" class="btn-accent btn-sm" type="button">📋 Copy</button></div>
+              <hr style="border:0; border-top:1.5px solid var(--border); margin:20px 0;" />
+              <label>Short slug (5‑32 chars)
+                <div class="row"><input id="shortSlug" maxlength="32" placeholder="e.g. summer2025" style="flex:1;" /><button id="randomSlug" class="btn-ghost btn-sm" type="button">🎲 Random</button></div>
+              </label>
+              <label style="margin-top:10px;">Short invite link <input id="shortInviteLink" readonly /></label>
+              <div class="toolbar"><button id="saveShortInvite" class="btn-accent" type="button">💾 Save short link</button><button id="copyShortInvite" class="btn-ghost" type="button">📋 Copy</button></div>
+              <div class="notice notice-info" style="margin-top:16px;">The short slug is stored in the cloud and makes your invite link memorable.</div>
+            </div>
+            <div class="panel">
+              <h2>⚙️ Settings</h2>
+              <label>Currency
+                <select id="currencySelect">
+                  <option value="GBP">🇬🇧 British Pound (GBP)</option><option value="USD">🇺🇸 US Dollar (USD)</option><option value="EUR">🇪🇺 Euro (EUR)</option>
+                  <option value="JPY">🇯🇵 Japanese Yen (JPY)</option><option value="CAD">🇨🇦 Canadian Dollar (CAD)</option><option value="AUD">🇦🇺 Australian Dollar (AUD)</option>
+                  <option value="INR">🇮🇳 Indian Rupee (INR)</option><option value="CHF">🇨🇭 Swiss Franc (CHF)</option>
+                </select>
+              </label>
+              <div style="margin-top:16px;">
+                <h3>Sync status</h3>
+                <p id="syncStatusDetail" style="color:var(--text-muted); font-weight:500;">Local – changes are saved locally.</p>
+                <p style="font-size:13px; color:var(--text-muted); margin-top:6px;">The app automatically syncs with the cloud when online.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <div id="landingOverlay">
+    <div class="landing-card">
+      <h1 style="font-size:36px; margin-bottom:10px;">🧳 TripShare</h1>
+      <p style="color:var(--text-muted); margin-bottom:32px; font-size:16px;">Start a new trip or join an existing one via invite link.</p>
+      <button id="landingNewTrip" class="btn-accent" style="font-size:17px; padding:14px 32px;">➕ Create New Trip</button>
+      <div style="margin-top:24px; border-top:1.5px solid var(--border); padding-top:24px;">
+        <p style="font-size:14px; color:var(--text-muted); font-weight:500;">Already have an invite? Paste the short link or full URL.</p>
+        <div class="landing-input-group"><input id="landingInviteInput" placeholder="e.g. harbor" style="max-width:260px; display:inline-block; width:auto;" /><button id="landingGoInvite" class="btn-ghost" style="min-height:44px;">Go →</button></div>
+      </div>
+    </div>
+  </div>
+  <dialog id="createTripModal" class="modal">
+    <div class="modal-body">
+      <h2>🆕 Create a new trip</h2>
+      <p style="color:var(--text-muted); margin-bottom:20px; font-weight:500;">Choose a memorable short name for your trip. This will be used in the invite link.</p>
+      <label>Short slug <input id="createSlugInput" placeholder="e.g. summer2025" autocomplete="off" /></label>
+      <div style="margin-top:10px; font-size:14px; color:var(--text-muted); font-weight:500;">Your link will be: <span id="createSlugPreview" style="font-weight:700; color:var(--text);"></span></div>
+      <div class="toolbar" style="margin-top:20px;"><button id="cancelCreateTrip" class="btn-ghost" type="button">Cancel</button><button id="confirmCreateTrip" class="btn-accent" type="button">✅ Create Trip</button></div>
+    </div>
+  </dialog>
+  <dialog id="removeDialog" class="modal">
+    <div class="modal-body">
+      <h2 id="removeTitle">Remove participant</h2>
+      <div id="removeSummary" class="notice"></div>
+      <div class="toolbar">
+        <button id="cancelRemove" class="btn-ghost" type="button">Cancel</button>
+        <button id="confirmRemove" class="btn-danger" type="button">Remove participant</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="confirmModal" class="modal">
+    <div class="modal-body">
+      <h2 id="confirmTitle">Confirm</h2>
+      <p id="confirmMessage" style="color:var(--text-muted); margin-bottom:20px; font-weight:500; line-height:1.6;"></p>
+      <div class="toolbar"><button id="confirmCancel" class="btn-ghost" type="button">Cancel</button><button id="confirmAction" class="btn-danger" type="button">Confirm</button></div>
+    </div>
+  </dialog>
+  <div id="toastContainer" class="toast-container"></div>
+
   <script type="module">
     /* ============================================================
-       TripShare v3 — Show all settlements in dashboard preview
+       TripShare v3 — UI shows individual split amounts for all types
        ============================================================ */
     const APP_SUPABASE_URL = "https://cusegeussklgueqpwkbz.supabase.co";
     const APP_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1c2VnZXVzc2tsZ3VlcXB3a2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTc1MDksImV4cCI6MjA5NzQ3MzUwOX0.HOO_Ko5Rk9fKDVXEwGDZye5JupcvIwewH50tN19JRXE";
@@ -531,10 +1113,13 @@
         const netAmount = getNetAmount(exp);
         const hasRefund = Number(exp.refundAmount) > 0;
         
+        // --- Build split details with monetary amounts for ALL split types ---
         let splitDetail;
         if (exp.splitType === 'exact' && exp.exactAmounts) {
+          // Exact split already has amounts
           splitDetail = `Exact: ${Object.entries(exp.exactAmounts).map(([name, amt]) => `${name}: ${fmtMoney(amt)}`).join(', ')}`;
         } else {
+          // Equal or Ratio: calculate monetary share for each participant
           const shareDetails = participants.map(name => {
             const share = netAmount * (exp.splitShares[name] || 0);
             return `${name}: ${fmtMoney(share)}`;
@@ -613,18 +1198,18 @@
             <span class="cat-amount">${fmtMoney(val)}</span>
           </div>`).join("");
       }
-      // ---- Settlement preview: show ALL settlements ----
       const settlements = calculateSettlements();
       const previewWrap = $("settlementPreview");
       if (!settlements.length) {
         previewWrap.innerHTML = `<span style="color:var(--text-muted); font-size:14px; font-weight:500;">✅ Everyone is settled.</span>`;
       } else {
-        previewWrap.innerHTML = settlements.map(item => `
+        const display = settlements.slice(0, 3);
+        const more = settlements.length > 3 ? ` (+${settlements.length - 3} more)` : "";
+        previewWrap.innerHTML = display.map(item => `
           <div style="font-size:14px; padding:4px 0; font-weight:500;">
             <strong>${escapeHtml(item.from)}</strong> <span style="color:var(--text-muted);">→</span> <strong>${escapeHtml(item.to)}</strong>
             <span style="float:right;font-weight:700;">${fmtMoney(item.amount)}</span>
-          </div>
-        `).join("");
+          </div>`).join("") + (more ? `<div style="color:var(--text-muted);font-size:13px;margin-top:6px; font-weight:500;">${more}</div>` : "");
       }
     }
 
